@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth bg-gray-50">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Confix - Job Orders</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primaryBlue: '#1e40af',
+            primaryOrange: '#f97316',
+          },
+          fontFamily: {
+            sans: ['Inter', 'ui-sans-serif', 'system-ui'],
+          }
+        }
+      }
+    }
+  </script>
+  <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet" />
+</head>
+<body class="font-sans">
+
+<div class="max-w-4xl mx-auto px-6 py-10 bg-white rounded-lg shadow-md my-12">
+
+  <h1 class="text-primaryBlue font-bold text-3xl mb-4">Job Orders</h1>
+  <p class="text-gray-700 text-base mb-6">Overview and manage your job orders efficiently.</p>
+  <section id="jobOrdersSection" class="mt-12">
+    <h2 class="text-2xl font-semibold text-primaryBlue mb-6">Your Job Orders</h2>
+    <div id="jobOrdersList" class="space-y-6"></div>
+  </section>
+</div>
+
+<script>
+  const jobOrdersSection = document.getElementById('jobOrdersSection');
+  const jobOrdersList = document.getElementById('jobOrdersList');
+
+  function renderJobOrders(orders) {
+    jobOrdersList.innerHTML = '';
+    if (!orders.length) {
+      jobOrdersList.innerHTML = '<div class="text-gray-500">No job orders found.</div>';
+      return;
+    }
+    orders.forEach(order => {
+      let statusLine = '';
+      if (order.status === 'Completed') {
+        statusLine = `<p class="text-gray-700">Status: <span class="font-semibold ${order.status_color}">${order.status}</span></p><p class="text-gray-700">Completed on: ${order.completion_date || ''}</p>`;
+      } else if (order.status === 'Pending') {
+        statusLine = `<p class="text-gray-700">Status: <span class="font-semibold ${order.status_color}">${order.status}</span></p><p class="text-gray-700">Expected Completion: ${order.expected_date || ''}</p>`;
+      } else if (order.status === 'Overdue') {
+        statusLine = `<p class="text-gray-700">Status: <span class="font-semibold ${order.status_color}">${order.status}</span></p><p class="text-gray-700">Was due on: ${order.expected_date || ''}</p>`;
+      } else {
+        statusLine = `<p class="text-gray-700">Status: <span class="font-semibold">${order.status}</span></p>`;
+      }
+      jobOrdersList.innerHTML += `
+        <div class="border border-gray-300 rounded-lg p-6 shadow-sm hover:shadow-md transition duration-300">
+          <h3 class="text-lg font-semibold text-primaryBlue">${order.title}</h3>
+          <p class="text-gray-700">Assigned to: ${order.assigned_to}</p>
+          ${statusLine}
+        </div>
+      `;
+    });
+  }
+
+  // Fetch and show job orders on page load
+  window.addEventListener('DOMContentLoaded', () => {
+    fetch('/api/job-orders')
+      .then(res => res.json())
+      .then(data => {
+        renderJobOrders(data);
+      })
+      .catch(() => {
+        jobOrdersList.innerHTML = '<div class="text-red-500">Failed to load job orders.</div>';
+      });
+  });
+</script>
+
+</body>
+</html>
