@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Skyline Suites - Property Management</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-blue-50 min-h-screen">
+  <!-- HEADER -->
+  <header class="bg-gradient-to-r from-blue-700 via-blue-600 to-orange-400 shadow-md">
+    <div class="max-w-7xl mx-auto flex items-center justify-between px-4 py-3 sm:px-6">
+      <div class="flex items-center">
+        <img src="https://img.icons8.com/color/48/000000/building.png" alt="Logo" class="w-10 h-10 mr-1">
+        <span class="text-white font-bold text-xl tracking-wider">Skyline Suites</span>
+      </div>
+      <button id="menu-btn" class="sm:hidden text-white focus:outline-none">
+        <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M4 6h16M4 12h16M4 18h16"/>
+        </svg>
+      </button>
+      <nav class="hidden sm:flex space-x-7 text-lg">
+        <a href="#" data-nav="welcome" class="nav-link text-white hover:text-orange-300 duration-150">Home</a>
+        <a href="#" class="text-white hover:text-orange-300 duration-150">About</a>
+        <a href="#" class="text-white hover:text-orange-300 duration-150">Contact</a>
+        <a href="#" data-nav="profile" class="nav-link flex items-center hover:text-orange-300 text-white duration-150">
+          <svg class="w-6 h-6 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M5.121 17.804A13.937 13.937 0 0112 15c2.925 0 5.623.896 7.879 2.418
+                M15 12a3 3 0 11-6 0 3 3 0 016 0zm6 0a9 9 0 11-18 0 9 9 0 0118 0z"/>
+          </svg>Profile
+        </a>
+      </nav>
+    </div>
+    <!-- Mobile Menu -->
+    <div id="mobile-menu" class="hidden px-4 pb-4 sm:hidden">
+      <a href="#" data-nav="welcome" class="nav-link block py-2 text-white hover:text-orange-300">Home</a>
+      <a href="#" class="block py-2 text-white hover:text-orange-300">About</a>
+      <a href="#" class="block py-2 text-white hover:text-orange-300">Contact</a>
+      <a href="#" data-nav="profile" class="nav-link block py-2 text-white hover:text-orange-300">Profile</a>
+    </div>
+  </header>
+
+  <div class="flex flex-col sm:flex-row min-h-[85vh]">
+    <!-- SIDEBAR -->
+    <aside class="bg-blue-800 sm:w-60 w-full flex-shrink-0 py-7 px-4 flex flex-row sm:flex-col overflow-x-auto border-b sm:border-b-0 sm:border-r border-blue-700">
+      <div class="flex items-center mb-5 sm:mb-10">
+        <span class="text-2xl text-orange-400 font-extrabold tracking-widest ml-2">Skyline</span>
+      </div>
+      <nav class="flex flex-row sm:flex-col gap-2 sm:gap-0 w-full justify-center sm:justify-start">
+        <a href="#" data-nav="dashboard" class="nav-link flex items-center sm:space-x-2 py-2 px-3 sm:px-3 rounded-lg text-white hover:bg-blue-900 w-full justify-center sm:justify-start active:bg-blue-900"><span>🏠</span> <span class="hidden sm:inline">Dashboard</span></a>
+        <a href="#" data-nav="viewbills" class="nav-link flex items-center sm:space-x-2 py-2 px-3 sm:px-3 rounded-lg text-white hover:bg-blue-900 w-full justify-center sm:justify-start"><span>💡</span> <span class="hidden sm:inline">View Bills</span></a>
+        <a href="#" data-nav="payment" class="nav-link flex items-center sm:space-x-2 py-2 px-3 sm:px-3 rounded-lg text-white hover:bg-blue-900 w-full justify-center sm:justify-start"><span>💳</span> <span class="hidden sm:inline">Payments</span></a>
+        <a href="#" data-nav="complaint" class="nav-link flex items-center sm:space-x-2 py-2 px-3 sm:px-3 rounded-lg text-white hover:bg-blue-900 w-full justify-center sm:justify-start"><span>📝</span> <span class="hidden sm:inline">Complaints</span></a>
+        <a href="#" data-nav="notifications" class="nav-link flex items-center sm:space-x-2 py-2 px-3 sm:px-3 rounded-lg text-white hover:bg-blue-900 w-full justify-center sm:justify-start"><span>🔔</span> <span class="hidden sm:inline">Notifications</span></a>
+        <a href="#" data-nav="profile" class="nav-link flex items-center sm:space-x-2 py-2 px-3 sm:px-3 rounded-lg text-white hover:bg-blue-900 w-full justify-center sm:justify-start"><span>👤</span> <span class="hidden sm:inline">Profile</span></a>
+        <a href="#" data-nav="calendar" class="nav-link flex items-center sm:space-x-2 py-2 px-3 sm:px-3 rounded-lg text-white hover:bg-blue-900 w-full justify-center sm:justify-start"><span>📅</span> <span class="hidden sm:inline">Calendar</span></a>
+        <a href="#" data-nav="announcements" class="nav-link flex items-center sm:space-x-2 py-2 px-3 sm:px-3 rounded-lg text-white hover:bg-blue-900 w-full justify-center sm:justify-start"><span>📢</span> <span class="hidden sm:inline">Announcements</span></a>
+        <a href="#" data-nav="settings" class="nav-link flex items-center sm:space-x-2 py-2 px-3 sm:px-3 rounded-lg text-white hover:bg-blue-900 w-full justify-center sm:justify-start"><span>⚙️</span> <span class="hidden sm:inline">Settings</span></a>
+      </nav>
+    </aside>
+    
+    <!-- MAIN CONTENT -->
+    <main class="flex-1 p-6 sm:p-10 bg-white rounded-tl-3xl sm:rounded-l-3xl shadow-lg">
+      <!-- ALL PAGE PANELS -->
+      <section id="welcome-panel" class="page-panel">
+        <h1 class="text-3xl sm:text-4xl text-blue-800 font-bold mb-2">Welcome to Skyline Property Hub</h1>
+        <p class="text-lg sm:text-xl text-gray-700 mb-4">Effortless living, seamless service. Manage all your property needs in one place.</p>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-5 mb-4">
+          <div class="p-5 bg-gradient-to-r from-blue-600 via-blue-400 to-orange-300 rounded-xl shadow-lg">
+            <div class="flex items-center mb-2">
+              <span class="text-2xl mr-2">💡</span>
+              <span class="font-semibold text-lg text-white">View Bills</span>
+            </div>
+            <p class="text-white">Check your current and past property bills.</p>
+          </div>
+          <div class="p-5 bg-gradient-to-r from-orange-400 via-blue-400 to-blue-700 rounded-xl shadow-lg">
+            <div class="flex items-center mb-2">
+              <span class="text-2xl mr-2">💳</span>
+              <span class="font-semibold text-lg text-white">Make Payment</span>
+            </div>
+            <p class="text-white">Pay dues securely online in just a few clicks.</p>
+          </div>
+          <div class="p-5 bg-gradient-to-r from-blue-700 via-orange-400 to-blue-600 rounded-xl shadow-lg">
+            <div class="flex items-center mb-2">
+              <span class="text-2xl mr-2">📝</span>
+              <span class="font-semibold text-lg text-white">Submit Complaint</span>
+            </div>
+            <p class="text-white">Log issues and track resolution progress.</p>
+          </div>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+          <div class="p-5 bg-gradient-to-r from-blue-300 via-orange-400 to-blue-900 rounded-xl shadow-lg">
+            <div class="flex items-center mb-2">
+              <span class="text-2xl mr-2">🔔</span>
+              <span class="font-semibold text-lg text-white">Notifications</span>
+            </div>
+            <p class="text-white">Stay updated with recent activities.</p>
+          </div>
+          <div class="p-5 bg-gradient-to-r from-blue-100 via-blue-400 to-orange-400 rounded-xl shadow-lg">
+            <div class="flex items-center mb-2">
+              <span class="text-2xl mr-2">📅</span>
+              <span class="font-semibold text-lg text-white">Calendar</span>
+            </div>
+            <p class="text-white">Never miss property events and schedules.</p>
+          </div>
+          <div class="p-5 bg-gradient-to-r from-orange-400 via-blue-300 to-blue-800 rounded-xl shadow-lg">
+            <div class="flex items-center mb-2">
+              <span class="text-2xl mr-2">📢</span>
+              <span class="font-semibold text-lg text-white">Announcements</span>
+            </div>
+            <p class="text-white">Latest updates from management.</p>
+          </div>
+        </div>
+      </section>
+
+      <section id="dashboard-panel" class="page-panel hidden">
+        <h2 class="text-2xl text-blue-700 font-bold mb-4">Dashboard Overview</h2>
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div class="bg-blue-100 rounded p-4 flex flex-col items-center">
+            <span class="text-3xl">💡</span>
+            <span class="text-blue-700 font-semibold mt-2">Bills Due</span>
+            <span class="text-lg font-bold">₱3,500</span>
+          </div>
+          <div class="bg-orange-100 rounded p-4 flex flex-col items-center">
+            <span class="text-3xl">📝</span>
+            <span class="text-orange-700 font-semibold mt-2">Complaints</span>
+            <span class="text-lg font-bold">2</span>
+          </div>
+          <div class="bg-blue-200 rounded p-4 flex flex-col items-center">
+            <span class="text-3xl">📅</span>
+            <span class="text-blue-800 font-semibold mt-2">Upcoming Events</span>
+            <span class="text-lg font-bold">3</span>
+          </div>
+          <div class="bg-orange-200 rounded p-4 flex flex-col items-center">
+            <span class="text-3xl">📢</span>
+            <span class="text-orange-800 font-semibold mt-2">Announcements</span>
+            <span class="text-lg font-bold">1</span>
+          </div>
+        </div>
+      </section>
+
+      <section id="viewbills-panel" class="page-panel hidden">
+        <h2 class="text-2xl text-blue-700 font-bold mb-4">View Bills</h2>
+        <table class="min-w-full divide-y divide-blue-200 bg-white shadow-md rounded">
+          <thead>
+            <tr>
+              <th class="px-6 py-2 text-left text-blue-700">Month</th>
+              <th class="px-6 py-2 text-left text-blue-700">Amount</th>
+              <th class="px-6 py-2 text-left text-blue-700">Status</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-blue-100">
+            <tr>
+              <td class="px-6 py-2">August</td>
+              <td class="px-6 py-2">₱3,500</td>
+              <td class="px-6 py-2 text-orange-600">Pending</td>
+            </tr>
+            <tr>
+              <td class="px-6 py-2">July</td>
+              <td class="px-6 py-2">₱3,200</td>
+              <td class="px-6 py-2 text-green-600">Paid</td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+
+      <section id="payment-panel" class="page-panel hidden">
+        <h2 class="text-2xl text-blue-700 font-bold mb-4">Make Payment</h2>
+        <form id="payment-form" class="bg-blue-50 p-6 rounded flex flex-col max-w-sm space-y-4">
+          <label class="font-medium">Amount (₱)
+            <input required type="number" min="100" value="3500" class="w-full px-4 py-2 border rounded mt-1 focus:outline-none focus:border-orange-400" />
+          </label>
+          <label class="font-medium">Card Number
+            <input required type="text" maxlength="16" class="w-full px-4 py-2 border rounded mt-1 focus:outline-none focus:border-orange-400" />
+          </label>
+          <label class="font-medium">Name on Card
+            <input required type="text" class="w-full px-4 py-2 border rounded mt-1 focus:outline-none focus:border-orange-400" />
+          </label>
+          <button type="submit" class="bg-orange-400 hover:bg-orange-500 text-white py-2 rounded font-bold">Pay Now</button>
+        </form>
+        <p id="payment-success" class="hidden mt-4 text-green-600 font-bold">Payment successful!</p>
+      </section>
+
+      <section id="complaint-panel" class="page-panel hidden">
+        <h2 class="text-2xl text-blue-700 font-bold mb-4">Submit Complaint</h2>
+        <form id="complaint-form" class="bg-blue-50 p-6 rounded flex flex-col max-w-lg space-y-4">
+          <label class="font-medium">Subject
+            <input required type="text" class="w-full px-4 py-2 border rounded mt-1 focus:outline-none focus:border-orange-400" />
+          </label>
+          <label class="font-medium">Description
+            <textarea required class="w-full px-4 py-2 border rounded mt-1 focus:outline-none focus:border-orange-400"></textarea>
+          </label>
+          <button type="submit" class="bg-orange-400 hover:bg-orange-500 text-white py-2 rounded font-bold">Submit</button>
+        </form>
+        <p id="complaint-success" class="hidden mt-4 text-green-600 font-bold">Complaint submitted!</p>
+      </section>
+
+      <section id="notifications-panel" class="page-panel hidden">
+        <h2 class="text-2xl text-blue-700 font-bold mb-4">Notifications</h2>
+        <div class="space-y-2">
+          <div class="bg-blue-100 px-4 py-2 rounded">Bill for August is due soon.</div>
+          <div class="bg-orange-100 px-4 py-2 rounded">Maintenance on your floor scheduled for Friday.</div>
+        </div>
+      </section>
+
+      <section id="profile-panel" class="page-panel hidden">
+        <h2 class="text-2xl text-blue-700 font-bold mb-4">User Profile</h2>
+        <div class="flex items-center space-x-4">
+          <img src="https://randomuser.me/api/portraits/men/31.jpg" class="w-20 h-20 rounded-full border-4 border-blue-300" alt="profile">
+          <div>
+            <div class="font-bold text-xl text-blue-800">Alex Rivera</div>
+            <div class="text-gray-500">Unit 21A, Skyline Suites</div>
+            <div class="text-gray-400 text-sm">alex.rivera@email.com</div>
+          </div>
+        </div>
+      </section>
+
+      <section id="calendar-panel" class="page-panel hidden">
+        <h2 class="text-2xl text-blue-700 font-bold mb-4">Calendar</h2>
+        <ul class="list-disc pl-6 space-y-1">
+          <li>24 Sept, 2025 – Maintenance (all floors)</li>
+          <li>30 Sept, 2025 – Resident Meeting</li>
+        </ul>
+      </section>
+
+      <section id="announcements-panel" class="page-panel hidden">
+        <h2 class="text-2xl text-blue-700 font-bold mb-4">Announcements</h2>
+        <div class="bg-orange-50 p-4 rounded border border-orange-300">
+          <div class="font-bold text-orange-700">Pool Closure</div>
+          <div class="text-gray-700">The swimming pool will be closed for maintenance from Sept 25–28.</div>
+        </div>
+      </section>
+
+      <section id="settings-panel" class="page-panel hidden">
+        <h2 class="text-2xl text-blue-700 font-bold mb-4">Settings</h2>
+        <form class="space-y-4 max-w-md">
+          <label class="flex items-center space-x-3">
+            <input type="checkbox" class="accent-blue-600 rounded" checked>
+            <span class="font-medium">Email Notifications</span>
+          </label>
+          <label class="flex items-center space-x-3">
+            <input type="checkbox" class="accent-blue-600 rounded" checked>
+            <span class="font-medium">SMS Reminders</span>
+          </label>
+        </form>
+      </section>
+    </main>
+  </div>
+
+  <!-- Settings Floating Button -->
+  <button id="settings-fab" class="fixed bottom-8 right-8 bg-orange-400 hover:bg-orange-500 p-3 rounded-full shadow-xl text-white text-2xl sm:text-3xl z-20" aria-label="Settings">
+    ⚙️
+  </button>
+
+  <script>
+    // MOBILE NAV
+    const menuBtn = document.getElementById('menu-btn');
+    const mobileMenu = document.getElementById('mobile-menu');
+    menuBtn.onclick = () => mobileMenu.classList.toggle('hidden');
+
+    // SECTION NAVIGATION LOGIC
+    function showPanel(panelId) {
+      document.querySelectorAll('.page-panel').forEach(panel =>
+        panel.classList.add('hidden'));
+      document.getElementById(panelId + '-panel').classList.remove('hidden');
+      if (!mobileMenu.classList.contains('hidden')) mobileMenu.classList.add('hidden');
+    }
+
+    document.querySelectorAll('.nav-link').forEach(link => {
+      link.addEventListener('click', e => {
+        const nav = link.getAttribute('data-nav');
+        if (nav) {
+          e.preventDefault();
+          showPanel(nav);
+        }
+      });
+    });
+
+    // Default view: welcome
+    showPanel('welcome');
+    // Floating Settings
+    document.getElementById('settings-fab').onclick = () => showPanel('settings');
+
+    // Payment Form Handler
+    document.getElementById('payment-form').addEventListener('submit', function(e) {
+      e.preventDefault();
+      document.getElementById('payment-success').classList.remove('hidden');
+    });
+
+    // Complaint Form Handler
+    document.getElementById('complaint-form').addEventListener('submit', function(e) {
+      e.preventDefault();
+      document.getElementById('complaint-success').classList.remove('hidden');
+    });
+  </script>
+</body>
+</html>

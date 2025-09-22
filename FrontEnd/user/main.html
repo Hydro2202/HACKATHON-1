@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ConFix - Property Management Dashboard</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    /* Custom scrollbar */
+    ::-webkit-scrollbar {
+      width: 8px;
+    }
+    ::-webkit-scrollbar-thumb {
+      background-color: #2563eb; /* Tailwind blue-600 */
+      border-radius: 4px;
+    }
+
+    /* Animation for fade-in */
+    .fade-in {
+      animation: fadeIn 0.8s ease-in forwards;
+    }
+
+    @keyframes fadeIn {
+      from {opacity: 0; transform: translateY(20px);}
+      to {opacity: 1; transform: translateY(0);}
+    }
+  </style>
+</head>
+<body class="bg-gradient-to-r from-blue-100 to-blue-300 min-h-screen flex flex-col">
+  <!-- Header -->
+  <header class="flex items-center justify-between bg-blue-700 text-white px-4 py-3 shadow-md">
+    <div class="flex items-center space-x-2">
+      <img src="https://img.icons8.com/ios-filled/50/ffffff/home--v2.png" alt="logo" class="w-8 h-8" />
+      <span class="font-bold text-xl">ConFix</span>
+    </div>
+    <nav class="hidden md:flex space-x-6">
+      <a href="#" class="hover:text-blue-300 transition">Home</a>
+      <a href="#" class="hover:text-blue-300 transition">About</a>
+      <a href="#" class="hover:text-blue-300 transition">Contact</a>
+    </nav>
+    <div class="relative">
+      <button id="profileBtn" class="flex items-center space-x-2 hover:text-blue-300 transition focus:outline-none">
+        <img src="https://img.icons8.com/ios-glyphs/30/ffffff/user--v1.png" alt="profile" class="w-7 h-7 rounded-full" />
+        <span class="hidden md:block">Profile</span>
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+          <path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.29l3.71-4.06a.75.75 0 111.08 1.04l-4.25 4.65a.75.75 0 01-1.08 0L5.21 8.27a.75.75 0 01.02-1.06z" clip-rule="evenodd" />
+        </svg>
+      </button>
+      <div id="profileMenu" class="hidden absolute right-0 mt-2 w-40 bg-white rounded-md shadow-lg text-gray-700 z-20">
+        <a href="#" class="block px-4 py-2 hover:bg-blue-100 transition">View Profile</a>
+        <a href="#" class="block px-4 py-2 hover:bg-blue-100 transition">Settings</a>
+        <a href="#" class="block px-4 py-2 hover:bg-blue-100 transition">Logout</a>
+      </div>
+    </div>
+
+    <!-- Mobile Hamburger -->
+    <button id="mobileMenuBtn" class="md:hidden focus:outline-none">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+      </svg>
+    </button>
+  </header>
+
+  <div class="flex flex-1 min-h-0">
+    <!-- Sidebar -->
+    <aside id="sidebar" class="bg-blue-800 text-blue-100 w-64 p-4 space-y-6 flex flex-col transition-transform md:translate-x-0 fixed md:static inset-y-0 z-30 md:z-auto">
+      <div class="flex items-center space-x-2 mb-8">
+        <img src="https://img.icons8.com/ios-filled/50/93c5fd/home--v2.png" alt="logo" class="w-8 h-8" />
+        <span class="font-bold text-lg">ConFix</span>
+      </div>
+      <nav class="flex flex-col space-y-3 text-blue-200 text-sm">
+        <a href="#" class="py-2 px-3 rounded hover:bg-blue-700 hover:text-white transition flex items-center space-x-2">
+          <img src="https://img.icons8.com/ios-filled/24/93c5fd/bill.png" alt="bills" />
+          <span>View Bills / Payments</span>
+        </a>
+        <a href="#" class="py-2 px-3 rounded hover:bg-blue-700 hover:text-white transition flex items-center space-x-2">
+          <img src="https://img.icons8.com/ios-filled/24/93c5fd/complaint--v1.png" alt="complaint" />
+          <span>Submit Complaint</span>
+        </a>
+        <a href="#" class="py-2 px-3 rounded hover:bg-blue-700 hover:text-white transition flex items-center space-x-2">
+          <img src="https://img.icons8.com/ios-filled/24/93c5fd/appointment-reminders--v1.png" alt="notification" />
+          <span>Notification</span>
+        </a>
+        <a href="#" class="py-2 px-3 rounded hover:bg-blue-700 hover:text-white transition flex items-center space-x-2">
+          <img src="https://img.icons8.com/ios-filled/24/93c5fd/user-male-circle--v1.png" alt="profile" />
+          <span>Profile</span>
+        </a>
+        <a href="#" class="py-2 px-3 rounded hover:bg-blue-700 hover:text-white transition flex items-center space-x-2">
+          <img src="https://img.icons8.com/ios-filled/24/93c5fd/calendar--v1.png" alt="calendar" />
+          <span>Calendar</span>
+        </a>
+        <a href="#" class="py-2 px-3 rounded hover:bg-blue-700 hover:text-white transition flex items-center space-x-2">
+          <img src="https://img.icons8.com/ios-filled/24/93c5fd/announcement--v1.png" alt="announcement" />
+          <span>Announcement</span>
+        </a>
+        <a href="#" class="py-2 px-3 rounded hover:bg-blue-700 hover:text-white transition flex items-center space-x-2">
+          <img src="https://img.icons8.com/ios-filled/24/93c5fd/settings--v1.png" alt="settings" />
+          <span>Settings</span>
+        </a>
+        <a href="#" class="py-2 px-3 rounded hover:bg-blue-700 hover:text-white transition flex items-center space-x-2">
+          <img src="https://img.icons8.com/ios-filled/24/93c5fd/logout-rounded-left.png" alt="logout" />
+          <span>Logout</span>
+        </a>
+      </nav>
+    </aside>
+
+    <!-- Main content -->
+    <main class="flex-1 p-6 md:ml-64 overflow-auto fade-in">
+      <div class="max-w-4xl mx-auto">
+        <h1 class="text-3xl font-extrabold text-blue-900 mb-4">Welcome to ConFix</h1>
+        <p class="text-blue-700 mb-8">Your ultimate condo and hotel property management dashboard.</p>
+        <section id="content-area" class="bg-white rounded-lg shadow-lg p-6">
+          <p class="text-gray-700">Select an option from the sidebar to get started.</p>
+        </section>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    // Toggle profile menu
+    const profileBtn = document.getElementById('profileBtn');
+    const profileMenu = document.getElementById('profileMenu');
+    profileBtn.addEventListener('click', () => {
+      profileMenu.classList.toggle('hidden');
+    });
+
+    // Toggle mobile sidebar
+    const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+    const sidebar = document.getElementById('sidebar');
+    mobileMenuBtn.addEventListener('click', () => {
+      sidebar.classList.toggle('-translate-x-full');
+    });
+
+    // Close menus when clicking outside
+    window.addEventListener('click', (e) => {
+      if (!profileBtn.contains(e.target) && !profileMenu.contains(e.target)) {
+        profileMenu.classList.add('hidden');
+      }
+    });
+
+    // Initialize sidebar offscreen for mobile
+    sidebar.classList.add('-translate-x-full');
+  </script>
+</body>
+</html>
