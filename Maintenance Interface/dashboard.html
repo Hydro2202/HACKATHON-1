@@ -1,0 +1,535 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>ConFix — Dashboard</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect fill='%230877d4' width='100' height='100' rx='18'/%3E%3Cpath d='M30 55 L45 40 L70 65' stroke='white' stroke-width='6' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    .top-actions { display:flex; gap:8px; align-items:center; justify-content:space-between; }
+    .search { display:flex; gap:8px; align-items:center; }
+    .small { font-size:13px; color:#6f98c6; }
+    .profile-pic { width:40px; height:40px; border-radius:10px; background:#eaf6ff; display:flex;align-items:center;justify-content:center; font-weight:700; color:#0366a6; }
+    .qr-video { width:100%; height:260px; background:#000; border-radius:8px; overflow:hidden; display:flex; align-items:center; justify-content:center; }
+    .section-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+    .full { grid-column: 1 / -1; }
+  </style>
+</head>
+<body>
+  <div class="app" role="main">
+    <div class="header">
+      <div class="logo" aria-hidden="true">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <rect x="1" y="1" width="22" height="22" rx="5" fill="white" opacity="0.12"/>
+          <path d="M6 12h6l3 3" stroke="white" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <div style="flex:1;">
+        <div class="app-title">ConFix</div>
+        <div style="font-size:12px; opacity:0.95;">Property Maintenance Dashboard</div>
+      </div>
+      <div style="display:flex;flex-direction:column;align-items:flex-end;">
+        <div class="small">Welcome, <span id="userName" style="font-weight:700"></span></div>
+        <div class="profile-pic" id="profileInitial">D</div>
+      </div>
+    </div>
+
+    <div class="content" id="mainContent">
+      <!-- Top controls -->
+      <div class="card top-actions">
+        <div style="display:flex;flex-direction:column;">
+          <div style="font-weight:700">Overview</div>
+          <div class="small">Open, pending and recent jobs</div>
+        </div>
+        <div style="display:flex;gap:8px;align-items:center;">
+          <button id="logoutBtn" class="btn btn-ghost">Logout</button>
+        </div>
+      </div>
+
+      <!-- Dashboard sections -->
+      <div class="section-grid">
+        <div class="card">
+          <h3>Complaint</h3>
+          <div class="field">
+            <input id="complaintTitle" class="input" placeholder="Short title (e.g. Leaky faucet - Apt 2B)">
+            <textarea id="complaintDesc" class="textarea" placeholder="Describe the issue..."></textarea>
+            <div style="display:flex;gap:8px;">
+              <button id="addComplaint" class="btn btn-primary">Add Complaint</button>
+              <button id="clearComplaints" class="btn btn-ghost">Clear all</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3>Job Order</h3>
+          <div class="field">
+            <input id="jobTitle" class="input" placeholder="Job title">
+            <select id="jobPriority" class="select">
+              <option value="low">Low priority</option>
+              <option value="normal" selected>Normal</option>
+              <option value="high">High priority</option>
+            </select>
+            <div style="display:flex;gap:8px;">
+              <button id="addJob" class="btn btn-primary">Create Job Order</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="card full">
+          <h3>Status update</h3>
+          <div style="display:flex;gap:8px;margin-bottom:8px;">
+            <select id="selectItem" class="select" style="flex:1;">
+              <option value="">Select complaint or job</option>
+            </select>
+            <select id="newStatus" class="select" style="width:150px;">
+              <option value="open">Open</option>
+              <option value="inprogress">In Progress</option>
+              <option value="done">Done</option>
+            </select>
+            <button id="updateStatus" class="btn btn-primary">Update</button>
+          </div>
+          <div id="statusLog" class="small" style="color:#5b7fa2"></div>
+        </div>
+
+        <div class="card">
+          <h3>Pending</h3>
+          <div id="pendingList" class="list"></div>
+        </div>
+
+        <div class="card">
+          <h3>Situation</h3>
+          <div class="field">
+            <textarea id="situationText" class="textarea" placeholder="Write current situation or notes..."></textarea>
+            <div style="display:flex;gap:8px;">
+              <button id="addSituation" class="btn btn-primary">Add Situation Note</button>
+              <button id="clearSituation" class="btn btn-ghost">Clear Notes</button>
+            </div>
+            <div id="situationList" style="margin-top:8px;"></div>
+          </div>
+        </div>
+
+        <div class="card full">
+          <h3>Recent items</h3>
+          <div id="recentItems" class="list"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bottom nav -->
+    <div class="bottom-nav" role="navigation" aria-label="Main">
+      <button class="nav-btn" id="navHome" title="Home">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M3 11.5L12 4l9 7.5" stroke="#0b67b3" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M5 20V12h14v8" stroke="#0b67b3" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Home
+      </button>
+
+      <button class="nav-btn" id="navQR" title="Scan QR">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="3" y="3" width="6" height="6" stroke="#0b67b3" stroke-width="1.6" rx="1"/><rect x="15" y="3" width="6" height="6" stroke="#0b67b3" stroke-width="1.6" rx="1"/><rect x="3" y="15" width="6" height="6" stroke="#0b67b3" stroke-width="1.6" rx="1"/><rect x="15" y="15" width="6" height="6" stroke="#0b67b3" stroke-width="1.6" rx="1"/></svg>
+        Scan
+      </button>
+
+      <button class="nav-btn" id="navProfile" title="Profile">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 12a4 4 0 100-8 4 4 0 000 8z" stroke="#0b67b3" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M4 20a8 8 0 0116 0" stroke="#0b67b3" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Profile
+      </button>
+    </div>
+  </div>
+
+  <!-- QR modal -->
+  <div id="qrModal" class="modal" style="display:none;">
+    <div class="modal-card card">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+        <div style="font-weight:700">QR Scanner</div>
+        <button id="closeQr" class="btn btn-ghost">Close</button>
+      </div>
+      <div id="qrContainer">
+        <div class="qr-video" id="qrVideoWrap">
+          <video id="qrVideo" autoplay playsinline style="width:100%;height:100%;object-fit:cover;"></video>
+          <canvas id="qrCanvas" style="display:none;"></canvas>
+        </div>
+        <div style="margin-top:10px;display:flex;gap:8px;align-items:center;">
+          <button id="startScan" class="btn btn-primary">Start Camera</button>
+          <input id="qrFile" type="file" accept="image/*" style="display:none;">
+          <button id="uploadImage" class="btn btn-ghost">Upload Image</button>
+        </div>
+        <div id="qrResult" class="small" style="margin-top:10px;"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Profile modal -->
+  <div id="profileModal" class="modal" style="display:none;">
+    <div class="modal-card card">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+        <div style="font-weight:700">Profile</div>
+        <button id="closeProfile" class="btn btn-ghost">Close</button>
+      </div>
+      <div style="display:flex;gap:12px;align-items:center;">
+        <div style="width:64px;height:64px;border-radius:12px;background:#eaf6ff;display:flex;align-items:center;justify-content:center;font-weight:700;color:#0366a6;font-size:18px;">D</div>
+        <div>
+          <div id="profileEmail" style="font-weight:700"></div>
+          <div style="color:#5b7fa2;font-size:13px;">Property manager</div>
+        </div>
+      </div>
+
+      <div style="margin-top:12px;">
+        <button id="exportData" class="btn btn-primary" style="width:100%;">Export Data (JSON)</button>
+        <button id="clearData" class="btn btn-ghost" style="width:100%;margin-top:8px;">Clear All App Data</button>
+      </div>
+    </div>
+  </div>
+
+<script>
+  // Basic data model in localStorage
+  const STORAGE_KEY = 'confix_items'; // array of items {id, type: Complaint|Job Order, title, desc, status, created}
+  const SITUATION_KEY = 'confix_situation';
+
+  // helper functions
+  const uid = (prefix='i') => prefix + '-' + Math.random().toString(36).slice(2,9);
+  const getItems = () => JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+  const setItems = (arr) => localStorage.setItem(STORAGE_KEY, JSON.stringify(arr));
+  const getSituation = () => JSON.parse(localStorage.getItem(SITUATION_KEY) || '[]');
+  const setSituation = (arr) => localStorage.setItem(SITUATION_KEY, JSON.stringify(arr));
+
+  // user
+  const user = JSON.parse(localStorage.getItem('confix_user') || 'null');
+  if (!user) {
+    // if no user, redirect to login
+    window.location.href = 'login.html';
+  }
+
+  document.getElementById('userName').textContent = user.name || user.email;
+  document.getElementById('profileInitial').textContent = (user.name || 'U').slice(0,1).toUpperCase();
+  document.getElementById('profileEmail').textContent = user.email;
+
+  // UI elements
+  const complaintTitle = document.getElementById('complaintTitle');
+  const complaintDesc = document.getElementById('complaintDesc');
+  const addComplaintBtn = document.getElementById('addComplaint');
+  const clearComplaintsBtn = document.getElementById('clearComplaints');
+  const addJobBtn = document.getElementById('addJob');
+  const jobTitle = document.getElementById('jobTitle');
+  const jobPriority = document.getElementById('jobPriority');
+  const recentItems = document.getElementById('recentItems');
+  const pendingList = document.getElementById('pendingList');
+  const selectItem = document.getElementById('selectItem');
+  const newStatus = document.getElementById('newStatus');
+  const updateStatusBtn = document.getElementById('updateStatus');
+  const statusLog = document.getElementById('statusLog');
+  const situationText = document.getElementById('situationText');
+  const addSituation = document.getElementById('addSituation');
+  const situationList = document.getElementById('situationList');
+
+  function render() {
+    const items = getItems().sort((a,b)=> b.created - a.created);
+    // recent items
+    recentItems.innerHTML = '';
+    items.slice(0,10).forEach(it => {
+      const d = document.createElement('div');
+      d.className = 'item';
+      const meta = document.createElement('div');
+      meta.className = 'meta';
+      meta.innerHTML = `<div style="font-weight:700">${it.title}</div><div style="font-size:12px;color:#6f98c6">${it.type} • ${new Date(it.created).toLocaleString()}</div>`;
+      const right = document.createElement('div');
+      const s = document.createElement('div');
+      s.className = 'status ' + (it.status==='open' ? 'open' : it.status==='inprogress' ? 'inprogress' : 'done');
+      s.textContent = it.status.toUpperCase();
+      right.appendChild(s);
+      d.appendChild(meta);
+      d.appendChild(right);
+      recentItems.appendChild(d);
+    });
+
+    // pending
+    pendingList.innerHTML = '';
+    items.filter(it => it.status !== 'done').forEach(it => {
+      const e = document.createElement('div');
+      e.className = 'item';
+      e.innerHTML = `<div style="flex:1"><div style="font-weight:700">${it.title}</div><div style="font-size:12px;color:#6f98c6">${it.type}</div></div>
+      <div style="display:flex;flex-direction:column;gap:6px;align-items:flex-end">
+        <div class="status ${it.status}">${it.status.toUpperCase()}</div>
+        <div style="display:flex;gap:6px">
+          <button class="btn btn-ghost" data-id="${it.id}" onclick="editItem('${it.id}')">Edit</button>
+          <button class="btn btn-ghost" data-id="${it.id}" onclick="markDone('${it.id}')">Done</button>
+        </div>
+      </div>`;
+      pendingList.appendChild(e);
+    });
+
+    // select options
+    selectItem.innerHTML = '<option value="">Select complaint or job</option>';
+    items.forEach(it => {
+      const opt = document.createElement('option');
+      opt.value = it.id;
+      opt.textContent = `${it.type} — ${it.title} [${it.status}]`;
+      selectItem.appendChild(opt);
+    });
+
+    // situation list
+    const situations = getSituation().slice().sort((a,b)=> b.time - a.time);
+    situationList.innerHTML = situations.map(s=> `<div style="font-size:13px;padding:8px;border-radius:8px;border:1px solid #eef8ff;margin-bottom:6px;"><div style="font-weight:700">${new Date(s.time).toLocaleString()}</div><div style="color:#436b93">${s.text}</div></div>`).join('');
+
+    // status log small
+    statusLog.textContent = `${items.length} total items — ${items.filter(i=>i.status==='open').length} open, ${items.filter(i=>i.status==='inprogress').length} in progress, ${items.filter(i=>i.status==='done').length} done.`;
+  }
+
+  // actions
+  addComplaintBtn.addEventListener('click', () => {
+    const title = complaintTitle.value.trim();
+    const desc = complaintDesc.value.trim();
+    if (!title) return alert('Add a short title for the complaint.');
+    const items = getItems();
+    items.push({ id: uid('c'), type: 'Complaint', title, desc, status:'open', created: Date.now() });
+    setItems(items);
+    complaintTitle.value=''; complaintDesc.value='';
+    render();
+  });
+
+  clearComplaintsBtn.addEventListener('click', () => {
+    if (!confirm('Clear all complaints and jobs?')) return;
+    setItems([]);
+    render();
+  });
+
+  addJobBtn.addEventListener('click', () => {
+    const title = jobTitle.value.trim();
+    if (!title) return alert('Add a job title.');
+    const items = getItems();
+    items.push({ id: uid('j'), type: 'Job Order', title, priority: jobPriority.value, status:'open', created: Date.now() });
+    setItems(items);
+    jobTitle.value='';
+    render();
+  });
+
+  updateStatusBtn.addEventListener('click', () => {
+    const id = selectItem.value;
+    const st = newStatus.value;
+    if (!id) return alert('Choose an item to update.');
+    const items = getItems();
+    const idx = items.findIndex(i=>i.id===id);
+    if (idx === -1) return alert('Item not found.');
+    items[idx].status = st;
+    // append a small history object (optional)
+    items[idx].updatedAt = Date.now();
+    setItems(items);
+    render();
+    alert('Status updated.');
+  });
+
+  window.editItem = function(id) {
+    const items = getItems();
+    const it = items.find(i=>i.id===id);
+    if (!it) return alert('Item not found');
+    const newTitle = prompt('Edit title', it.title);
+    if (newTitle === null) return;
+    it.title = newTitle;
+    setItems(items);
+    render();
+  }
+
+  window.markDone = function(id) {
+    const items = getItems();
+    const it = items.find(i=>i.id===id);
+    if (!it) return;
+    it.status = 'done';
+    setItems(items);
+    render();
+  }
+
+  addSituation.addEventListener('click', () => {
+    const t = situationText.value.trim();
+    if (!t) return alert('Add situation note.');
+    const s = getSituation();
+    s.push({ time: Date.now(), text: t });
+    setSituation(s);
+    situationText.value='';
+    render();
+  });
+
+  document.getElementById('clearSituation').addEventListener('click', () => {
+    if (!confirm('Clear all situation notes?')) return;
+    setSituation([]);
+    render();
+  });
+
+  // profile modal actions
+  document.getElementById('navProfile').addEventListener('click', ()=> {
+    document.getElementById('profileModal').style.display='flex';
+  });
+  document.getElementById('closeProfile').addEventListener('click', ()=> {
+    document.getElementById('profileModal').style.display='none';
+  });
+  document.getElementById('exportData').addEventListener('click', ()=> {
+    const data = { items:getItems(), situation:getSituation(), user };
+    const blob = new Blob([JSON.stringify(data, null, 2)], {type:'application/json'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'confix-data.json';
+    a.click();
+    URL.revokeObjectURL(url);
+  });
+  document.getElementById('clearData').addEventListener('click', ()=> {
+    if (!confirm('Clear all ConFix data (items, situations, session)?')) return;
+    localStorage.removeItem(STORAGE_KEY);
+    localStorage.removeItem(SITUATION_KEY);
+    localStorage.removeItem('confix_user');
+    window.location.href = 'login.html';
+  });
+
+  document.getElementById('logoutBtn').addEventListener('click', ()=> {
+    localStorage.removeItem('confix_user');
+    window.location.href='login.html';
+  });
+
+  // bottom nav
+  document.getElementById('navHome').addEventListener('click', ()=> {
+    document.getElementById('mainContent').scrollIntoView({behavior:'smooth'});
+  });
+
+  // QR scanner modal logic
+  const qrModal = document.getElementById('qrModal');
+  const startScanBtn = document.getElementById('startScan');
+  const closeQr = document.getElementById('closeQr');
+  const navQR = document.getElementById('navQR');
+  const qrVideo = document.getElementById('qrVideo');
+  const qrCanvas = document.getElementById('qrCanvas');
+  const qrResult = document.getElementById('qrResult');
+  const qrFile = document.getElementById('qrFile');
+  const uploadImage = document.getElementById('uploadImage');
+  let stream = null;
+  let scanning = false;
+  let detector = null;
+  // Attempt to create BarcodeDetector if available
+  if ('BarcodeDetector' in window) {
+    const supported = BarcodeDetector.getSupportedFormats().then(f => {
+      // choose qrcode if available
+      detector = new BarcodeDetector({formats: ['qr_code']});
+    }).catch(e => { detector = null; });
+  }
+
+  navQR.addEventListener('click', ()=> {
+    qrModal.style.display='flex';
+    qrResult.textContent = '';
+  });
+  closeQr.addEventListener('click', closeScanner);
+
+  function closeScanner() {
+    qrModal.style.display='none';
+    stopStream();
+    scanning = false;
+  }
+
+  startScanBtn.addEventListener('click', async () => {
+    if (scanning) { stopStream(); startScanBtn.textContent='Start Camera'; scanning=false; return; }
+    // start camera
+    try {
+      stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
+      qrVideo.srcObject = stream;
+      await qrVideo.play();
+      scanning = true;
+      startScanBtn.textContent='Stop Camera';
+      scanLoop();
+    } catch (e) {
+      alert('Camera access denied or unavailable. You can upload an image instead.');
+    }
+  });
+
+  function stopStream() {
+    if (stream) {
+      stream.getTracks().forEach(t=>t.stop());
+      stream = null;
+    }
+    qrVideo.pause();
+    qrVideo.srcObject = null;
+    startScanBtn.textContent='Start Camera';
+  }
+
+  async function scanLoop() {
+    if (!scanning) return;
+    if (!qrVideo.videoWidth) {
+      requestAnimationFrame(scanLoop); return;
+    }
+    const w = qrVideo.videoWidth;
+    const h = qrVideo.videoHeight;
+    qrCanvas.width = w; qrCanvas.height = h;
+    const ctx = qrCanvas.getContext('2d');
+    ctx.drawImage(qrVideo, 0, 0, w, h);
+
+    if (detector) {
+      try {
+        // Use BarcodeDetector if available
+        const bitmap = await createImageBitmap(qrCanvas);
+        const barcodes = await detector.detect(bitmap);
+        if (barcodes && barcodes.length) {
+          const txt = barcodes[0].rawValue;
+          qrResult.textContent = 'Scanned: ' + txt;
+          // Example action: try to match item id and highlight
+          handleScannedText(txt);
+          // stop after successful read
+          scanning = false;
+          stopStream();
+        }
+      } catch (e) {
+        // ignore and continue
+      }
+    } else {
+      // fallback: draw and attempt to read via browser (not available). We update the user that BarcodeDetector is not supported.
+      qrResult.textContent = 'Live scanning unavailable in this browser. Use "Upload Image" or switch to Chrome/Edge with BarcodeDetector.';
+    }
+
+    if (scanning) requestAnimationFrame(scanLoop);
+  }
+
+  uploadImage.addEventListener('click', ()=> qrFile.click());
+  qrFile.addEventListener('change', async (ev) => {
+    const f = ev.target.files[0];
+    if (!f) return;
+    const img = new Image();
+    const url = URL.createObjectURL(f);
+    img.onload = async () => {
+      // draw to canvas & try BarcodeDetector
+      const ctx = qrCanvas.getContext('2d');
+      qrCanvas.width = img.width; qrCanvas.height = img.height;
+      ctx.drawImage(img,0,0);
+      if (detector) {
+        try {
+          const bitmap = await createImageBitmap(qrCanvas);
+          const barcodes = await detector.detect(bitmap);
+          if (barcodes && barcodes.length) {
+            const txt = barcodes[0].rawValue;
+            qrResult.textContent = 'Scanned from image: ' + txt;
+            handleScannedText(txt);
+            URL.revokeObjectURL(url);
+            return;
+          }
+        } catch(e){}
+      }
+      // fallback message
+      qrResult.textContent = 'Could not read QR automatically. If the code contains an item id, paste it below:';
+      const manual = prompt('QR content or item id (paste here):');
+      if (manual) handleScannedText(manual);
+      URL.revokeObjectURL(url);
+    };
+    img.src = url;
+  });
+
+  function handleScannedText(txt) {
+    // Try to find an item with id or title containing the scanned text
+    const items = getItems();
+    const found = items.find(i => i.id === txt || i.title.toLowerCase().includes(txt.toLowerCase()));
+    if (found) {
+      alert(`Found item: ${found.title}\nType: ${found.type}\nStatus: ${found.status}`);
+      // highlight by opening the item editor or selecting it
+      selectItem.value = found.id;
+      selectItem.scrollIntoView({behavior:'smooth'});
+    } else {
+      alert('No matching item found for: ' + txt + '\nYou can create a new job with this as reference.');
+    }
+  }
+
+  // init render
+  render();
+</script>
+</body>
+</html>

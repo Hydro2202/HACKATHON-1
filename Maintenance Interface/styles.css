@@ -1,0 +1,143 @@
+/* styles.css - ConFix (blue & white theme) */
+
+/* Basic reset */
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html,body { height:100%; }
+body {
+  font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+  background: #f6fbff;
+  color: #03396c;
+  -webkit-font-smoothing:antialiased;
+  -moz-osx-font-smoothing:grayscale;
+  line-height:1.35;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:0;
+}
+
+/* App container */
+.app {
+  width:100%;
+  max-width:420px;
+  background:#ffffff;
+  border-radius:14px;
+  box-shadow:0 8px 30px rgba(3,57,108,0.08);
+  overflow:hidden;
+  display:flex;
+  flex-direction:column;
+  min-height:600px;
+  margin:0 auto;
+  padding:0 0 24px 0;
+}
+
+
+/* Header */
+.header {
+  display:flex;
+  align-items:center;
+  gap:12px;
+  padding:18px 18px 12px 18px;
+  background: #fff;
+  color: #013a5a;
+  box-shadow: 0 2px 12px rgba(3,57,108,0.07);
+  border-bottom: 1px solid #eaf6ff;
+}
+
+.logo {
+  width:44px;height:44px;
+  flex:0 0 44px;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  border-radius:10px;
+  background:rgba(255,255,255,0.12);
+}
+.app-title { font-weight:600; font-size:18px; }
+
+/* Content area */
+.content {
+  padding:20px 14px 0 14px;
+  flex:1 1 auto;
+  overflow:auto;
+}
+
+
+/* Cards */
+.card {
+  background: #ffffff;
+  border-radius:12px;
+  box-shadow: 0 4px 16px rgba(3,57,108,0.04);
+  padding:18px 14px;
+  margin-bottom:18px;
+  border:1px solid rgba(3,57,108,0.04);
+}
+
+.card h3 { font-size:15px; margin-bottom:8px; color:#013a5a; }
+
+/* small form elements */
+.field { display:flex; flex-direction:column; gap:6px; margin-bottom:8px; }
+.input, .textarea, .select {
+  border:1px solid #dbeefc;
+  padding:10px 12px;
+  border-radius:8px;
+  font-size:14px;
+  color:#023a5d;
+  background:white;
+}
+.textarea { min-height:80px; resize:vertical; }
+.btn {
+  display:inline-flex; align-items:center; justify-content:center;
+  padding:10px 12px; border-radius:10px; cursor:pointer;
+  border:0; font-weight:600;
+}
+.btn-primary { background:#0877d4; color:white; box-shadow: 0 6px 18px rgba(8,119,212,0.18); }
+.btn-ghost { background:transparent; border:1px solid #dbeefc; color:#023a5d; }
+
+/* Lists */
+.list { display:flex; flex-direction:column; gap:8px; margin-top:8px; }
+.item {
+  display:flex; align-items:center; justify-content:space-between;
+  padding:10px; border-radius:10px; border:1px solid #eef8ff;
+  background:linear-gradient(180deg,#ffffff,#fbfdff);
+}
+.item .meta { display:flex; flex-direction:column; gap:4px; }
+.status {
+  font-size:12px; padding:6px 8px; border-radius:999px; font-weight:700;
+}
+.status.open { background:#fff2e6; color:#b45309; }
+.status.inprogress { background:#e8f7ff; color:#0366a6; }
+.status.done { background:#e9fff0; color:#047857; }
+
+/* Bottom nav */
+.bottom-nav {
+  display:flex; gap:8px; padding:10px; border-top:1px solid rgba(3,57,108,0.05);
+  background:linear-gradient(180deg,#ffffff,#f7fbff);
+  justify-content:space-around;
+  align-items:center;
+}
+.nav-btn { display:flex; flex-direction:column; gap:4px; align-items:center; font-size:12px; color:#0b67b3; cursor:pointer; background:transparent; border:0; }
+.nav-icon { width:26px; height:26px; display:block; }
+
+/* Modals (simple) */
+.modal {
+  position:fixed; left:0; right:0; top:0; bottom:0;
+  display:flex; align-items:center; justify-content:center; z-index:40;
+  background:rgba(3,57,108,0.35);
+}
+.modal .modal-card {
+  width:94%; max-width:420px; background:white; border-radius:12px; padding:12px;
+}
+
+/* small helpers */
+.row { display:flex; gap:8px; align-items:center; }
+.badge { background:#eef6ff; color:#035a9a; padding:6px 8px; border-radius:999px; font-weight:700; font-size:12px; }
+
+/* responsive tweaks */
+@media(min-width:900px){
+  body { background:#eef7ff; }
+  .app { max-width:780px; min-height:640px; padding:0 0 32px 0; }
+  .content { padding:32px 32px 0 32px; }
+  .header { padding:24px 32px 16px 32px; }
+  .card { padding:24px 24px; margin-bottom:24px; }
+}
