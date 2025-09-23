@@ -1,0 +1,180 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Professional Condo Management Design System - All colors MUST be HSL */
+
+@layer base {
+  :root {
+    /* Core Background & Text */
+    --background: 220 20% 98%;
+    --foreground: 220 20% 15%;
+
+    /* Cards & Surfaces */
+    --card: 0 0% 100%;
+    --card-foreground: 220 20% 15%;
+
+    /* Popovers & Dropdowns */
+    --popover: 0 0% 100%;
+    --popover-foreground: 220 20% 15%;
+
+    /* Primary Brand - Professional Blue */
+    --primary: 217 91% 35%;
+    --primary-foreground: 0 0% 100%;
+    --primary-light: 217 91% 45%;
+    --primary-dark: 217 91% 25%;
+
+    /* Secondary - Warm Gray */
+    --secondary: 220 15% 95%;
+    --secondary-foreground: 220 20% 25%;
+
+    /* Muted Elements */
+    --muted: 220 15% 96%;
+    --muted-foreground: 220 15% 45%;
+
+    /* Accent - Success Green */
+    --accent: 142 76% 36%;
+    --accent-foreground: 0 0% 100%;
+
+    /* Status Colors */
+    --success: 142 76% 36%;
+    --success-foreground: 0 0% 100%;
+    --warning: 43 96% 56%;
+    --warning-foreground: 220 20% 15%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+
+    /* UI Elements */
+    --border: 220 15% 90%;
+    --input: 220 15% 94%;
+    --ring: 217 91% 35%;
+
+    --radius: 0.5rem;
+
+    /* Professional Gradients */
+    --gradient-primary: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--primary-light)));
+    --gradient-secondary: linear-gradient(135deg, hsl(var(--secondary)), hsl(var(--muted)));
+    
+    /* Dashboard Specific */
+    --dashboard-bg: linear-gradient(135deg, hsl(220 20% 99%), hsl(220 15% 97%));
+    
+    /* Sidebar Design */
+    --sidebar-background: 220 25% 8%;
+    --sidebar-foreground: 220 15% 85%;
+    --sidebar-primary: 217 91% 35%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 220 20% 12%;
+    --sidebar-accent-foreground: 220 15% 90%;
+    --sidebar-border: 220 20% 15%;
+    --sidebar-ring: 217 91% 35%;
+
+    /* Shadows & Effects */
+    --shadow-card: 0 4px 6px -1px hsl(220 15% 15% / 0.1), 0 2px 4px -1px hsl(220 15% 15% / 0.06);
+    --shadow-lg: 0 10px 15px -3px hsl(220 15% 15% / 0.1), 0 4px 6px -2px hsl(220 15% 15% / 0.05);
+    
+    /* Animations */
+    --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .dark {
+    /* Dark Mode - Professional Theme */
+    --background: 220 25% 6%;
+    --foreground: 220 15% 92%;
+
+    --card: 220 25% 8%;
+    --card-foreground: 220 15% 92%;
+
+    --popover: 220 25% 8%;
+    --popover-foreground: 220 15% 92%;
+
+    --primary: 217 91% 45%;
+    --primary-foreground: 0 0% 100%;
+    --primary-light: 217 91% 55%;
+    --primary-dark: 217 91% 35%;
+
+    --secondary: 220 20% 12%;
+    --secondary-foreground: 220 15% 85%;
+
+    --muted: 220 20% 10%;
+    --muted-foreground: 220 15% 65%;
+
+    --accent: 142 76% 46%;
+    --accent-foreground: 0 0% 100%;
+
+    --success: 142 76% 46%;
+    --success-foreground: 0 0% 100%;
+    --warning: 43 96% 66%;
+    --warning-foreground: 220 20% 15%;
+    --destructive: 0 84% 70%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 220 20% 15%;
+    --input: 220 20% 12%;
+    --ring: 217 91% 45%;
+
+    --gradient-primary: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--primary-light)));
+    --gradient-secondary: linear-gradient(135deg, hsl(var(--secondary)), hsl(var(--muted)));
+    --dashboard-bg: linear-gradient(135deg, hsl(220 25% 7%), hsl(220 20% 9%));
+    
+    --sidebar-background: 220 30% 4%;
+    --sidebar-foreground: 220 15% 85%;
+    --sidebar-primary: 217 91% 45%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 220 25% 8%;
+    --sidebar-accent-foreground: 220 15% 90%;
+    --sidebar-border: 220 20% 10%;
+    --sidebar-ring: 217 91% 45%;
+
+    --shadow-card: 0 4px 6px -1px hsl(220 30% 0% / 0.3), 0 2px 4px -1px hsl(220 30% 0% / 0.2);
+    --shadow-lg: 0 10px 15px -3px hsl(220 30% 0% / 0.3), 0 4px 6px -2px hsl(220 30% 0% / 0.2);
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground antialiased;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  }
+
+  /* Custom scrollbar */
+  ::-webkit-scrollbar {
+    width: 6px;
+  }
+  
+  ::-webkit-scrollbar-track {
+    @apply bg-muted;
+  }
+  
+  ::-webkit-scrollbar-thumb {
+    @apply bg-border rounded-full;
+  }
+  
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-muted-foreground;
+  }
+}
+
+@layer components {
+  /* Dashboard gradient background */
+  .dashboard-bg {
+    background: var(--dashboard-bg);
+  }
+  
+  /* Card shadows */
+  .card-shadow {
+    box-shadow: var(--shadow-card);
+  }
+  
+  .card-shadow-lg {
+    box-shadow: var(--shadow-lg);
+  }
+  
+  /* Smooth transitions */
+  .transition-smooth {
+    transition: var(--transition-smooth);
+  }
+}
