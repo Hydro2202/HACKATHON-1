@@ -6,6 +6,120 @@
     <title>ConFix - Dashboard</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .maintenance-indicator {
+            position: absolute;
+            bottom: 2px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+        }
+        
+        .tooltip {
+            position: absolute;
+            background: #333;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-size: 12px;
+            white-space: nowrap;
+            z-index: 1000;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.3s;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            margin-bottom: 5px;
+        }
+        
+        .tooltip::after {
+            content: '';
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            border-width: 5px 5px 0 5px;
+            border-style: solid;
+            border-color: #333 transparent transparent transparent;
+        }
+        
+        .calendar-day {
+            position: relative;
+            cursor: pointer;
+            height: 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .calendar-day:hover .tooltip {
+            opacity: 1;
+        }
+        
+        .maintenance-electricity {
+            background-color: #1E88E5;
+        }
+        
+        .maintenance-plumbing {
+            background-color: #4CAF50;
+        }
+        
+        .maintenance-elevator {
+            background-color: #FF9800;
+        }
+        
+        .maintenance-general {
+            background-color: #9C27B0;
+        }
+        
+        .bill-due {
+            background-color: #F44336;
+        }
+        
+        .notification-dot {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            width: 10px;
+            height: 10px;
+            background-color: #F44336;
+            border-radius: 50%;
+        }
+        
+        .card-hover:hover {
+            transform: translateY(-2px);
+            transition: transform 0.2s;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+        
+        .animate-fade-in {
+            animation: fadeIn 0.5s ease-in-out;
+        }
+        
+        .delay-100 {
+            animation-delay: 0.1s;
+        }
+        
+        .delay-200 {
+            animation-delay: 0.2s;
+        }
+        
+        .delay-300 {
+            animation-delay: 0.3s;
+        }
+        
+        .delay-400 {
+            animation-delay: 0.4s;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
     <script>
         tailwind.config = {
             theme: {
@@ -26,79 +140,7 @@
             }
         }
     </script>
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
-        
-        * {
-            font-family: 'Poppins', sans-serif;
-            transition: all 0.3s ease;
-        }
-        
-        .card-hover {
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-        }
-        
-        .card-hover:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 25px -5px rgba(30, 136, 229, 0.3);
-        }
-        
-        .sidebar {
-            transition: all 0.3s ease;
-        }
-        
-        .notification-dot {
-            position: absolute;
-            top: -5px;
-            right: -5px;
-            width: 12px;
-            height: 12px;
-            background-color: #EF5350;
-            border-radius: 50%;
-        }
-        
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        
-        .animate-fade-in {
-            animation: fadeIn 0.5s ease forwards;
-        }
-        
-        .delay-100 { animation-delay: 0.1s; }
-        .delay-200 { animation-delay: 0.2s; }
-        .delay-300 { animation-delay: 0.3s; }
-        .delay-400 { animation-delay: 0.4s; }
-        
-        @media (max-width: 768px) {
-            .sidebar {
-                transform: translateX(-100%);
-                position: fixed;
-                z-index: 50;
-                height: 100vh;
-            }
-            
-            .sidebar.open {
-                transform: translateX(0);
-            }
-            
-            .overlay {
-                display: none;
-                position: fixed;
-                top: 0;
-                left: 0;
-                right: 0;
-                bottom: 0;
-                background-color: rgba(0, 0, 0, 0.5);
-                z-index: 40;
-            }
-            
-            .overlay.open {
-                display: block;
-            }
-        }
-    </style>
+
 </head>
 <body class="bg-gray-50 min-h-screen flex">
     <!-- Sidebar -->
@@ -123,7 +165,7 @@
                     </a>
                 </li>
                 <li>
-                    <a href="#" class="flex items-center p-3 rounded-lg text-gray-600 hover:bg-secondary-light hover:text-primary-dark">
+                    <a href="bills.html" class="flex items-center p-3 rounded-lg text-gray-600 hover:bg-secondary-light hover:text-primary-dark">
                         <i class="fas fa-file-invoice-dollar mr-3"></i>
                         <span>View Bills</span>
                     </a>
@@ -141,7 +183,7 @@
                     </a>
                 </li>
                 <li>
-                    <a href="#" class="flex items-center p-3 rounded-lg text-gray-600 hover:bg-secondary-light hover:text-primary-dark">
+                    <a href="calendar.html" class="flex items-center p-3 rounded-lg text-gray-600 hover:bg-secondary-light hover:text-primary-dark">
                         <i class="fas fa-calendar-alt mr-3"></i>
                         <span>Calendar</span>
                     </a>
@@ -226,7 +268,7 @@
             <!-- Welcome banner -->
             <div class="bg-gradient-to-r from-primary-light to-primary-dark rounded-xl shadow-md p-6 text-white mb-6 animate-fade-in">
                 <h1 class="text-2xl md:text-3xl font-bold mb-2">Welcome back, John Doe!</h1>
-                <p class="opacity-90">Here's what's happening with your account today.</p>
+                <p class="opacity-90">Today is September 24, 2025. Here's what's happening with your account today.</p>
             </div>
             
             <!-- Stats overview -->
@@ -288,13 +330,13 @@
                     <div class="bg-white rounded-xl shadow-sm overflow-hidden animate-fade-in">
                         <div class="border-b border-gray-200 p-4 flex justify-between items-center">
                             <h3 class="font-semibold text-gray-800">Recent Bills</h3>
-                            <a href="#" class="text-primary-dark text-sm font-medium">View All</a>
+                            <a href="bills.html" class="text-primary-dark text-sm font-medium">View All</a>
                         </div>
                         <div class="p-4">
                             <div class="flex justify-between items-center py-3 border-b border-gray-100">
                                 <div>
-                                    <h4 class="font-medium">Water Bill - March 2023</h4>
-                                    <p class="text-sm text-gray-500">Due: Apr 15, 2023</p>
+                                    <h4 class="font-medium">Water Bill - August 2025</h4>
+                                    <p class="text-sm text-gray-500">Due: Sep 15, 2025</p>
                                 </div>
                                 <div class="text-right">
                                     <p class="font-semibold">$125.50</p>
@@ -304,8 +346,8 @@
                             
                             <div class="flex justify-between items-center py-3 border-b border-gray-100">
                                 <div>
-                                    <h4 class="font-medium">Electricity Bill - March 2023</h4>
-                                    <p class="text-sm text-gray-500">Due: Apr 12, 2023</p>
+                                    <h4 class="font-medium">Electricity Bill - August 2025</h4>
+                                    <p class="text-sm text-gray-500">Due: Sep 12, 2025</p>
                                 </div>
                                 <div class="text-right">
                                     <p class="font-semibold">$89.75</p>
@@ -315,8 +357,8 @@
                             
                             <div class="flex justify-between items-center py-3">
                                 <div>
-                                    <h4 class="font-medium">Maintenance Fee - March 2023</h4>
-                                    <p class="text-sm text-gray-500">Paid: Mar 28, 2023</p>
+                                    <h4 class="font-medium">Maintenance Fee - August 2025</h4>
+                                    <p class="text-sm text-gray-500">Paid: Aug 28, 2025</p>
                                 </div>
                                 <div class="text-right">
                                     <p class="font-semibold">$50.00</p>
@@ -379,80 +421,87 @@
                         <div class="border-b border-gray-200 p-4 flex justify-between items-center">
                             <h3 class="font-semibold text-gray-800">Calendar</h3>
                             <div class="flex space-x-2">
-                                <button class="text-gray-500 hover:text-primary-dark">
-                                    <i class="fas fa-chevron-left"></i>
-                                </button>
-                                <button class="text-gray-500 hover:text-primary-dark">
-                                    <i class="fas fa-chevron-right"></i>
-                                </button>
+                                <a href="calendar.html" class="text-primary-dark text-sm font-medium">View calendar</a>
                             </div>
                         </div>
                         <div class="p-4">
-                            <div class="text-center font-medium text-gray-700 mb-4">April 2023</div>
-                            <div class="grid grid-cols-7 gap-2 mb-2">
-                                <div class="text-center text-xs text-gray-500">Sun</div>
-                                <div class="text-center text-xs text-gray-500">Mon</div>
-                                <div class="text-center text-xs text-gray-500">Tue</div>
-                                <div class="text-center text-xs text-gray-500">Wed</div>
-                                <div class="text-center text-xs text-gray-500">Thu</div>
-                                <div class="text-center text-xs text-gray-500">Fri</div>
-                                <div class="text-center text-xs text-gray-500">Sat</div>
+                            <div class="text-center font-medium text-gray-700 mb-4">September 2025</div>
+                            <div class="grid grid-cols-7 gap-1 mb-2 text-xs">
+                                <div class="text-center text-gray-500 font-medium">Sun</div>
+                                <div class="text-center text-gray-500 font-medium">Mon</div>
+                                <div class="text-center text-gray-500 font-medium">Tue</div>
+                                <div class="text-center text-gray-500 font-medium">Wed</div>
+                                <div class="text-center text-gray-500 font-medium">Thu</div>
+                                <div class="text-center text-gray-500 font-medium">Fri</div>
+                                <div class="text-center text-gray-500 font-medium">Sat</div>
                             </div>
                             
-                            <div class="grid grid-cols-7 gap-2">
-                                <div class="text-center text-sm text-gray-400 py-1">26</div>
-                                <div class="text-center text-sm text-gray-400 py-1">27</div>
-                                <div class="text-center text-sm text-gray-400 py-1">28</div>
-                                <div class="text-center text-sm text-gray-400 py-1">29</div>
-                                <div class="text-center text-sm text-gray-400 py-1">30</div>
-                                <div class="text-center text-sm text-gray-400 py-1">31</div>
-                                <div class="text-center text-sm py-1">1</div>
+                            <div class="grid grid-cols-7 gap-1 text-sm">
+                                <!-- Week 1 - August dates -->
+                                <div class="calendar-day text-gray-400">31</div>
+                                <!-- September 1-6 -->
+                                <div class="calendar-day">1</div>
+                                <div class="calendar-day">2</div>
+                                <div class="calendar-day">3</div>
+                                <div class="calendar-day">4</div>
+                                <div class="calendar-day">5</div>
+                                <div class="calendar-day">6</div>
                                 
-                                <div class="text-center text-sm py-1">2</div>
-                                <div class="text-center text-sm py-1">3</div>
-                                <div class="text-center text-sm py-1">4</div>
-                                <div class="text-center text-sm py-1">5</div>
-                                <div class="text-center text-sm py-1">6</div>
-                                <div class="text-center text-sm py-1">7</div>
-                                <div class="text-center text-sm py-1">8</div>
+                                <!-- Week 2 -->
+                                <div class="calendar-day">7</div>
+                                <div class="calendar-day">8</div>
+                                <div class="calendar-day">9</div>
+                                <div class="calendar-day">10</div>
+                                <div class="calendar-day">11</div>
+                                <div class="calendar-day">
+                                    12
+                                    <div class="maintenance-indicator bill-due"></div>
+                                    <div class="tooltip">Electricity Bill Due</div>
+                                </div>
+                                <div class="calendar-day">13</div>
                                 
-                                <div class="text-center text-sm py-1">9</div>
-                                <div class="text-center text-sm py-1">10</div>
-                                <div class="text-center text-sm py-1">11</div>
-                                <div class="text-center text-sm py-1">12</div>
-                                <div class="text-center text-sm py-1">13</div>
-                                <div class="text-center text-sm py-1">14</div>
-                                <div class="text-center text-sm py-1">15</div>
+                                <!-- Week 3 -->
+                                <div class="calendar-day">14</div>
+                                <div class="calendar-day">
+                                    15
+                                    <div class="maintenance-indicator bill-due"></div>
+                                    <div class="tooltip">Water Bill Due</div>
+                                </div>
+                                <div class="calendar-day">16</div>
+                                <div class="calendar-day">17</div>
+                                <div class="calendar-day">18</div>
+                                <div class="calendar-day">19</div>
+                                <div class="calendar-day">20</div>
                                 
-                                <div class="text-center text-sm py-1">16</div>
-                                <div class="text-center text-sm py-1">17</div>
-                                <div class="text-center text-sm py-1 bg-blue-50 text-primary-dark rounded-full font-medium">18</div>
-                                <div class="text-center text-sm py-1">19</div>
-                                <div class="text-center text-sm py-1">20</div>
-                                <div class="text-center text-sm py-1">21</div>
-                                <div class="text-center text-sm py-1">22</div>
+                                <!-- Week 4 -->
+                                <div class="calendar-day">21</div>
+                                <div class="calendar-day">22</div>
+                                <div class="calendar-day">23</div>
+                                <div class="calendar-day relative bg-blue-50 rounded-full font-medium text-primary-dark">
+                                    24
+                                    <span class="absolute top-0 right-0 text-xs bg-primary-dark text-white px-1 rounded">Today</span>
+                                    <div class="maintenance-indicator maintenance-electricity"></div>
+                                    <div class="tooltip">Emergency Electrical Repair</div>
+                                </div>
+                                <div class="calendar-day">25</div>
+                                <div class="calendar-day">26</div>
+                                <div class="calendar-day">27</div>
                                 
-                                <div class="text-center text-sm py-1">23</div>
-                                <div class="text-center text-sm py-1">24</div>
-                                <div class="text-center text-sm py-1">25</div>
-                                <div class="text-center text-sm py-1">26</div>
-                                <div class="text-center text-sm py-1">27</div>
-                                <div class="text-center text-sm py-1">28</div>
-                                <div class="text-center text-sm py-1">29</div>
-                                
-                                <div class="text-center text-sm py-1">30</div>
-                                <div class="text-center text-sm text-gray-400 py-1">1</div>
-                                <div class="text-center text-sm text-gray-400 py-1">2</div>
-                                <div class="text-center text-sm text-gray-400 py-1">3</div>
-                                <div class="text-center text-sm text-gray-400 py-1">4</div>
-                                <div class="text-center text-sm text-gray-400 py-1">5</div>
-                                <div class="text-center text-sm text-gray-400 py-1">6</div>
+                                <!-- Week 5 -->
+                                <div class="calendar-day">28</div>
+                                <div class="calendar-day">29</div>
+                                <div class="calendar-day">30</div>
+                                <!-- October dates -->
+                                <div class="calendar-day text-gray-400">1</div>
+                                <div class="calendar-day text-gray-400">2</div>
+                                <div class="calendar-day text-gray-400">3</div>
+                                <div class="calendar-day text-gray-400">4</div>
                             </div>
                             
                             <div class="mt-4 pt-4 border-t border-gray-100">
                                 <div class="flex items-center mb-2">
                                     <div class="w-3 h-3 rounded-full bg-primary-dark mr-2"></div>
-                                    <p class="text-sm">Maintenance Day - Building Inspection</p>
+                                    <p class="text-sm">Maintenance Day - Electrical Repair (Today)</p>
                                 </div>
                                 <div class="flex items-center">
                                     <div class="w-3 h-3 rounded-full bg-red-500 mr-2"></div>
@@ -475,11 +524,11 @@
                                         <i class="fas fa-info-circle text-primary-dark"></i>
                                     </div>
                                     <div>
-                                        <h4 class="font-medium text-sm">Scheduled Water Maintenance</h4>
-                                        <p class="text-xs text-gray-500">Posted: Apr 10, 2023</p>
+                                        <h4 class="font-medium text-sm">Emergency Electrical Repair</h4>
+                                        <p class="text-xs text-gray-500">Posted: Sep 23, 2025</p>
                                     </div>
                                 </div>
-                                <p class="text-sm text-gray-600 mt-2">There will be a scheduled water maintenance on April 18, 2023 from 10:00 AM to 2:00 PM. Please store enough water for your needs.</p>
+                                <p class="text-sm text-gray-600 mt-2">Emergency electrical repair scheduled for September 24, 2025. Power may be interrupted for 2 hours between 10 AM - 12 PM.</p>
                             </div>
                             
                             <div class="mb-4 pb-4 border-b border-gray-100">
@@ -488,11 +537,11 @@
                                         <i class="fas fa-check-circle text-green-600"></i>
                                     </div>
                                     <div>
-                                        <h4 class="font-medium text-sm">New Payment System</h4>
-                                        <p class="text-xs text-gray-500">Posted: Apr 5, 2023</p>
+                                        <h4 class="font-medium text-sm">Quarterly Building Maintenance</h4>
+                                        <p class="text-xs text-gray-500">Posted: Sep 15, 2025</p>
                                     </div>
                                 </div>
-                                <p class="text-sm text-gray-600 mt-2">We've updated our payment system to make it easier for you to pay your bills online. Try it now!</p>
+                                <p class="text-sm text-gray-600 mt-2">Quarterly building maintenance scheduled for October 5-7, 2025. Please secure your belongings.</p>
                             </div>
                             
                             <div>
@@ -502,10 +551,10 @@
                                     </div>
                                     <div>
                                         <h4 class="font-medium text-sm">Elevator Maintenance</h4>
-                                        <p class="text-xs text-gray-500">Posted: Apr 2, 2023</p>
+                                        <p class="text-xs text-gray-500">Posted: Sep 10, 2025</p>
                                     </div>
                                 </div>
-                                <p class="text-sm text-gray-600 mt-2">The east elevator will be under maintenance from April 20-21, 2023. Please use the west elevator during this period.</p>
+                                <p class="text-sm text-gray-600 mt-2">The east elevator will be under maintenance from September 28-29, 2025. Please use the west elevator during this period.</p>
                             </div>
                         </div>
                     </div>
@@ -513,6 +562,22 @@
             </div>
         </main>
     </div>
-    
-    <!-- Mobile overlay -->
-    <div
+
+    <script>
+        // Toggle profile menu
+        document.getElementById('profileMenuBtn').addEventListener('click', function() {
+            document.getElementById('profileMenu').classList.toggle('hidden');
+        });
+
+        // Close profile menu when clicking outside
+        document.addEventListener('click', function(event) {
+            const profileMenu = document.getElementById('profileMenu');
+            const profileMenuBtn = document.getElementById('profileMenuBtn');
+            
+            if (!profileMenuBtn.contains(event.target) && !profileMenu.contains(event.target)) {
+                profileMenu.classList.add('hidden');
+            }
+        });
+    </script>
+</body>
+</html>

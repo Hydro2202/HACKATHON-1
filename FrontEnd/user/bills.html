@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ConFix - Bills</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+    * { font-family: 'Poppins', sans-serif; transition: all 0.25s ease; }
+  </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+  <!-- Header -->
+  <header class="bg-white shadow p-4 flex justify-between items-center">
+    <h1 class="text-xl font-bold text-primary-dark">All Bills</h1>
+    <a href="main.html" class="text-primary-dark hover:underline"><i class="fas fa-arrow-left mr-2"></i> Back to Dashboard</a>
+  </header>
+
+  <!-- Bills table -->
+  <main class="p-6">
+    <div class="bg-white rounded-xl shadow-lg p-6">
+      <table class="w-full text-left border-collapse">
+        <thead>
+          <tr class="text-sm text-gray-500 border-b">
+            <th class="py-2">Bill</th>
+            <th class="py-2">Due</th>
+            <th class="py-2 text-right">Amount</th>
+            <th class="py-2 text-right">Status</th>
+          </tr>
+        </thead>
+        <tbody id="billsTableBody" class="divide-y">
+          <!-- Bills will be loaded with JS -->
+        </tbody>
+      </table>
+    </div>
+  </main>
+
+  <script>
+    const STORAGE_KEYS = { BILLS: 'confix_bills_v1' };
+
+    function loadBills(){
+      const raw = localStorage.getItem(STORAGE_KEYS.BILLS);
+      return raw ? JSON.parse(raw) : [];
+    }
+
+    function renderBillsTable(){
+      const bills = loadBills();
+      const tbody = document.getElementById("billsTableBody");
+      tbody.innerHTML = "";
+      bills.forEach(b => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td class="py-3">
+            <div class="font-medium">${b.title}</div>
+            <div class="text-xs text-gray-500">ID: ${b.id}</div>
+          </td>
+          <td class="py-3">${b.due}</td>
+          <td class="py-3 text-right font-semibold">$${Number(b.amount).toFixed(2)}</td>
+          <td class="py-3 text-right">
+            <span class="px-2 py-1 text-xs rounded-full ${b.status === 'Paid' ? 'bg-green-100 text-green-600' : 'bg-red-100 text-red-600'}">${b.status}</span>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    renderBillsTable();
+  </script>
+</body>
+</html>
