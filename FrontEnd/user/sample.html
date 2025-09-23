@@ -1,299 +1,622 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Skyline Suites - Property Management</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>ConFix — Property Management Dashboard</title>
+  <!-- Tailwind CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    /* Tailwind config via inline for small tweaks */
+    @layer utilities {
+      .glass { background: rgba(255,255,255,0.6); backdrop-filter: blur(6px); }
+      .dark-glass { background: rgba(10,23,52,0.55); backdrop-filter: blur(6px); }
+    }
+    /* Smooth animations */
+    .fade-in { animation: fadeIn .45s ease both; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(6px)} to { opacity:1; transform: none } }
+  </style>
 </head>
-<body class="bg-blue-50 min-h-screen">
-  <!-- HEADER -->
-  <header class="bg-gradient-to-r from-blue-700 via-blue-600 to-orange-400 shadow-md">
-    <div class="max-w-7xl mx-auto flex items-center justify-between px-4 py-3 sm:px-6">
-      <div class="flex items-center">
-        <img src="https://img.icons8.com/color/48/000000/building.png" alt="Logo" class="w-10 h-10 mr-1">
-        <span class="text-white font-bold text-xl tracking-wider">Skyline Suites</span>
+<body class="min-h-screen bg-gradient-to-b from-blue-50 to-white text-slate-800">
+  <!-- Top nav for mobile -->
+  <header class="md:hidden bg-white/80 sticky top-0 z-40 backdrop-blur border-b border-slate-200">
+    <div class="flex items-center justify-between px-4 py-3">
+      <div class="flex items-center gap-3">
+        <button id="mobileMenuBtn" class="p-2 rounded-md hover:bg-slate-100">
+          <!-- hamburger -->
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-slate-700"><path d="M3 6h18M3 12h18M3 18h18" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+        <div class="flex items-center gap-2">
+          <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center text-white font-bold">C</div>
+          <span class="font-semibold">ConFix</span>
+        </div>
       </div>
-      <button id="menu-btn" class="sm:hidden text-white focus:outline-none">
-        <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                d="M4 6h16M4 12h16M4 18h16"/>
-        </svg>
-      </button>
-      <nav class="hidden sm:flex space-x-7 text-lg">
-        <a href="#" data-nav="welcome" class="nav-link text-white hover:text-orange-300 duration-150">Home</a>
-        <a href="#" class="text-white hover:text-orange-300 duration-150">About</a>
-        <a href="#" class="text-white hover:text-orange-300 duration-150">Contact</a>
-        <a href="#" data-nav="profile" class="nav-link flex items-center hover:text-orange-300 text-white duration-150">
-          <svg class="w-6 h-6 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                d="M5.121 17.804A13.937 13.937 0 0112 15c2.925 0 5.623.896 7.879 2.418
-                M15 12a3 3 0 11-6 0 3 3 0 016 0zm6 0a9 9 0 11-18 0 9 9 0 0118 0z"/>
-          </svg>Profile
-        </a>
-      </nav>
-    </div>
-    <!-- Mobile Menu -->
-    <div id="mobile-menu" class="hidden px-4 pb-4 sm:hidden">
-      <a href="#" data-nav="welcome" class="nav-link block py-2 text-white hover:text-orange-300">Home</a>
-      <a href="#" class="block py-2 text-white hover:text-orange-300">About</a>
-      <a href="#" class="block py-2 text-white hover:text-orange-300">Contact</a>
-      <a href="#" data-nav="profile" class="nav-link block py-2 text-white hover:text-orange-300">Profile</a>
+      <div class="flex items-center gap-3">
+        <button id="searchMobile" class="p-2 rounded-md hover:bg-slate-100"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7" stroke-linecap="round" stroke-linejoin="round"></circle><path d="M21 21l-4.35-4.35" stroke-linecap="round" stroke-linejoin="round"></path></svg></button>
+        <div class="relative">
+          <button id="notifBtnMobile" class="p-2 rounded-md hover:bg-slate-100 relative">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 17h5l-1.405-1.405A2.032 2.032 0 0 1 18 14.158V11a6 6 0 1 0-12 0v3.159c0 .538-.214 1.055-.595 1.436L4 17h5" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+            <span id="notifCountMobile" class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">0</span>
+          </button>
+        </div>
+      </div>
     </div>
   </header>
 
-  <div class="flex flex-col sm:flex-row min-h-[85vh]">
-    <!-- SIDEBAR -->
-    <aside class="bg-blue-800 sm:w-60 w-full flex-shrink-0 py-7 px-4 flex flex-row sm:flex-col overflow-x-auto border-b sm:border-b-0 sm:border-r border-blue-700">
-      <div class="flex items-center mb-5 sm:mb-10">
-        <span class="text-2xl text-orange-400 font-extrabold tracking-widest ml-2">Skyline</span>
+  <div class="flex">
+    <!-- Sidebar -->
+    <aside id="sidebar" class="hidden md:flex md:flex-col w-72 bg-white/70 dark-glass border-r border-slate-200 min-h-screen p-6 gap-6 sticky top-0">
+      <div class="flex items-center gap-3">
+        <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-400 to-blue-700 flex items-center justify-center text-white text-xl font-extrabold shadow-lg">C</div>
+        <div>
+          <h1 class="text-xl font-bold">ConFix</h1>
+          <p class="text-sm text-slate-500">Property Management</p>
+        </div>
       </div>
-      <nav class="flex flex-row sm:flex-col gap-2 sm:gap-0 w-full justify-center sm:justify-start">
-        <a href="#" data-nav="dashboard" class="nav-link flex items-center sm:space-x-2 py-2 px-3 sm:px-3 rounded-lg text-white hover:bg-blue-900 w-full justify-center sm:justify-start active:bg-blue-900"><span>🏠</span> <span class="hidden sm:inline">Dashboard</span></a>
-        <a href="#" data-nav="viewbills" class="nav-link flex items-center sm:space-x-2 py-2 px-3 sm:px-3 rounded-lg text-white hover:bg-blue-900 w-full justify-center sm:justify-start"><span>💡</span> <span class="hidden sm:inline">View Bills</span></a>
-        <a href="#" data-nav="payment" class="nav-link flex items-center sm:space-x-2 py-2 px-3 sm:px-3 rounded-lg text-white hover:bg-blue-900 w-full justify-center sm:justify-start"><span>💳</span> <span class="hidden sm:inline">Payments</span></a>
-        <a href="#" data-nav="complaint" class="nav-link flex items-center sm:space-x-2 py-2 px-3 sm:px-3 rounded-lg text-white hover:bg-blue-900 w-full justify-center sm:justify-start"><span>📝</span> <span class="hidden sm:inline">Complaints</span></a>
-        <a href="#" data-nav="notifications" class="nav-link flex items-center sm:space-x-2 py-2 px-3 sm:px-3 rounded-lg text-white hover:bg-blue-900 w-full justify-center sm:justify-start"><span>🔔</span> <span class="hidden sm:inline">Notifications</span></a>
-        <a href="#" data-nav="profile" class="nav-link flex items-center sm:space-x-2 py-2 px-3 sm:px-3 rounded-lg text-white hover:bg-blue-900 w-full justify-center sm:justify-start"><span>👤</span> <span class="hidden sm:inline">Profile</span></a>
-        <a href="#" data-nav="calendar" class="nav-link flex items-center sm:space-x-2 py-2 px-3 sm:px-3 rounded-lg text-white hover:bg-blue-900 w-full justify-center sm:justify-start"><span>📅</span> <span class="hidden sm:inline">Calendar</span></a>
-        <a href="#" data-nav="announcements" class="nav-link flex items-center sm:space-x-2 py-2 px-3 sm:px-3 rounded-lg text-white hover:bg-blue-900 w-full justify-center sm:justify-start"><span>📢</span> <span class="hidden sm:inline">Announcements</span></a>
-        <a href="#" data-nav="settings" class="nav-link flex items-center sm:space-x-2 py-2 px-3 sm:px-3 rounded-lg text-white hover:bg-blue-900 w-full justify-center sm:justify-start"><span>⚙️</span> <span class="hidden sm:inline">Settings</span></a>
-      </nav>
-    </aside>
-    
-    <!-- MAIN CONTENT -->
-    <main class="flex-1 p-6 sm:p-10 bg-white rounded-tl-3xl sm:rounded-l-3xl shadow-lg">
-      <!-- ALL PAGE PANELS -->
-      <section id="welcome-panel" class="page-panel">
-        <h1 class="text-3xl sm:text-4xl text-blue-800 font-bold mb-2">Welcome to Skyline Property Hub</h1>
-        <p class="text-lg sm:text-xl text-gray-700 mb-4">Effortless living, seamless service. Manage all your property needs in one place.</p>
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-5 mb-4">
-          <div class="p-5 bg-gradient-to-r from-blue-600 via-blue-400 to-orange-300 rounded-xl shadow-lg">
-            <div class="flex items-center mb-2">
-              <span class="text-2xl mr-2">💡</span>
-              <span class="font-semibold text-lg text-white">View Bills</span>
-            </div>
-            <p class="text-white">Check your current and past property bills.</p>
-          </div>
-          <div class="p-5 bg-gradient-to-r from-orange-400 via-blue-400 to-blue-700 rounded-xl shadow-lg">
-            <div class="flex items-center mb-2">
-              <span class="text-2xl mr-2">💳</span>
-              <span class="font-semibold text-lg text-white">Make Payment</span>
-            </div>
-            <p class="text-white">Pay dues securely online in just a few clicks.</p>
-          </div>
-          <div class="p-5 bg-gradient-to-r from-blue-700 via-orange-400 to-blue-600 rounded-xl shadow-lg">
-            <div class="flex items-center mb-2">
-              <span class="text-2xl mr-2">📝</span>
-              <span class="font-semibold text-lg text-white">Submit Complaint</span>
-            </div>
-            <p class="text-white">Log issues and track resolution progress.</p>
-          </div>
-        </div>
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
-          <div class="p-5 bg-gradient-to-r from-blue-300 via-orange-400 to-blue-900 rounded-xl shadow-lg">
-            <div class="flex items-center mb-2">
-              <span class="text-2xl mr-2">🔔</span>
-              <span class="font-semibold text-lg text-white">Notifications</span>
-            </div>
-            <p class="text-white">Stay updated with recent activities.</p>
-          </div>
-          <div class="p-5 bg-gradient-to-r from-blue-100 via-blue-400 to-orange-400 rounded-xl shadow-lg">
-            <div class="flex items-center mb-2">
-              <span class="text-2xl mr-2">📅</span>
-              <span class="font-semibold text-lg text-white">Calendar</span>
-            </div>
-            <p class="text-white">Never miss property events and schedules.</p>
-          </div>
-          <div class="p-5 bg-gradient-to-r from-orange-400 via-blue-300 to-blue-800 rounded-xl shadow-lg">
-            <div class="flex items-center mb-2">
-              <span class="text-2xl mr-2">📢</span>
-              <span class="font-semibold text-lg text-white">Announcements</span>
-            </div>
-            <p class="text-white">Latest updates from management.</p>
-          </div>
-        </div>
-      </section>
 
-      <section id="dashboard-panel" class="page-panel hidden">
-        <h2 class="text-2xl text-blue-700 font-bold mb-4">Dashboard Overview</h2>
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <div class="bg-blue-100 rounded p-4 flex flex-col items-center">
-            <span class="text-3xl">💡</span>
-            <span class="text-blue-700 font-semibold mt-2">Bills Due</span>
-            <span class="text-lg font-bold">₱3,500</span>
-          </div>
-          <div class="bg-orange-100 rounded p-4 flex flex-col items-center">
-            <span class="text-3xl">📝</span>
-            <span class="text-orange-700 font-semibold mt-2">Complaints</span>
-            <span class="text-lg font-bold">2</span>
-          </div>
-          <div class="bg-blue-200 rounded p-4 flex flex-col items-center">
-            <span class="text-3xl">📅</span>
-            <span class="text-blue-800 font-semibold mt-2">Upcoming Events</span>
-            <span class="text-lg font-bold">3</span>
-          </div>
-          <div class="bg-orange-200 rounded p-4 flex flex-col items-center">
-            <span class="text-3xl">📢</span>
-            <span class="text-orange-800 font-semibold mt-2">Announcements</span>
-            <span class="text-lg font-bold">1</span>
-          </div>
-        </div>
-      </section>
-
-      <section id="viewbills-panel" class="page-panel hidden">
-        <h2 class="text-2xl text-blue-700 font-bold mb-4">View Bills</h2>
-        <table class="min-w-full divide-y divide-blue-200 bg-white shadow-md rounded">
-          <thead>
-            <tr>
-              <th class="px-6 py-2 text-left text-blue-700">Month</th>
-              <th class="px-6 py-2 text-left text-blue-700">Amount</th>
-              <th class="px-6 py-2 text-left text-blue-700">Status</th>
-            </tr>
-          </thead>
-          <tbody class="divide-y divide-blue-100">
-            <tr>
-              <td class="px-6 py-2">August</td>
-              <td class="px-6 py-2">₱3,500</td>
-              <td class="px-6 py-2 text-orange-600">Pending</td>
-            </tr>
-            <tr>
-              <td class="px-6 py-2">July</td>
-              <td class="px-6 py-2">₱3,200</td>
-              <td class="px-6 py-2 text-green-600">Paid</td>
-            </tr>
-          </tbody>
-        </table>
-      </section>
-
-      <section id="payment-panel" class="page-panel hidden">
-        <h2 class="text-2xl text-blue-700 font-bold mb-4">Make Payment</h2>
-        <form id="payment-form" class="bg-blue-50 p-6 rounded flex flex-col max-w-sm space-y-4">
-          <label class="font-medium">Amount (₱)
-            <input required type="number" min="100" value="3500" class="w-full px-4 py-2 border rounded mt-1 focus:outline-none focus:border-orange-400" />
-          </label>
-          <label class="font-medium">Card Number
-            <input required type="text" maxlength="16" class="w-full px-4 py-2 border rounded mt-1 focus:outline-none focus:border-orange-400" />
-          </label>
-          <label class="font-medium">Name on Card
-            <input required type="text" class="w-full px-4 py-2 border rounded mt-1 focus:outline-none focus:border-orange-400" />
-          </label>
-          <button type="submit" class="bg-orange-400 hover:bg-orange-500 text-white py-2 rounded font-bold">Pay Now</button>
-        </form>
-        <p id="payment-success" class="hidden mt-4 text-green-600 font-bold">Payment successful!</p>
-      </section>
-
-      <section id="complaint-panel" class="page-panel hidden">
-        <h2 class="text-2xl text-blue-700 font-bold mb-4">Submit Complaint</h2>
-        <form id="complaint-form" class="bg-blue-50 p-6 rounded flex flex-col max-w-lg space-y-4">
-          <label class="font-medium">Subject
-            <input required type="text" class="w-full px-4 py-2 border rounded mt-1 focus:outline-none focus:border-orange-400" />
-          </label>
-          <label class="font-medium">Description
-            <textarea required class="w-full px-4 py-2 border rounded mt-1 focus:outline-none focus:border-orange-400"></textarea>
-          </label>
-          <button type="submit" class="bg-orange-400 hover:bg-orange-500 text-white py-2 rounded font-bold">Submit</button>
-        </form>
-        <p id="complaint-success" class="hidden mt-4 text-green-600 font-bold">Complaint submitted!</p>
-      </section>
-
-      <section id="notifications-panel" class="page-panel hidden">
-        <h2 class="text-2xl text-blue-700 font-bold mb-4">Notifications</h2>
-        <div class="space-y-2">
-          <div class="bg-blue-100 px-4 py-2 rounded">Bill for August is due soon.</div>
-          <div class="bg-orange-100 px-4 py-2 rounded">Maintenance on your floor scheduled for Friday.</div>
-        </div>
-      </section>
-
-      <section id="profile-panel" class="page-panel hidden">
-        <h2 class="text-2xl text-blue-700 font-bold mb-4">User Profile</h2>
-        <div class="flex items-center space-x-4">
-          <img src="https://randomuser.me/api/portraits/men/31.jpg" class="w-20 h-20 rounded-full border-4 border-blue-300" alt="profile">
-          <div>
-            <div class="font-bold text-xl text-blue-800">Alex Rivera</div>
-            <div class="text-gray-500">Unit 21A, Skyline Suites</div>
-            <div class="text-gray-400 text-sm">alex.rivera@email.com</div>
-          </div>
-        </div>
-      </section>
-
-      <section id="calendar-panel" class="page-panel hidden">
-        <h2 class="text-2xl text-blue-700 font-bold mb-4">Calendar</h2>
-        <ul class="list-disc pl-6 space-y-1">
-          <li>24 Sept, 2025 – Maintenance (all floors)</li>
-          <li>30 Sept, 2025 – Resident Meeting</li>
+      <nav class="flex-1">
+        <ul class="space-y-2">
+          <li><a href="#home" class="nav-link flex items-center gap-3 p-3 rounded-lg hover:bg-blue-50 transition"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 9.5L12 3l9 6.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1V9.5z" stroke-linecap="round" stroke-linejoin="round"/></svg> Dashboard</a></li>
+          <li><a href="#bills" class="nav-link flex items-center gap-3 p-3 rounded-lg hover:bg-blue-50 transition"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="2" y="6" width="20" height="14" rx="2" stroke-linecap="round" stroke-linejoin="round"/></svg> Bills</a></li>
+          <li><a href="#complaint" class="nav-link flex items-center gap-3 p-3 rounded-lg hover:bg-blue-50 transition"> <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" stroke-linecap="round" stroke-linejoin="round"></path><path d="M7 10l5 5 5-5" stroke-linecap="round" stroke-linejoin="round"></path></svg> Complaints</a></li>
+          <li><a href="#calendar" class="nav-link flex items-center gap-3 p-3 rounded-lg hover:bg-blue-50 transition"> <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="4" width="18" height="18" rx="2" stroke-linecap="round" stroke-linejoin="round"></rect><path d="M16 2v4M8 2v4M3 10h18" stroke-linecap="round" stroke-linejoin="round"></path></svg> Calendar</a></li>
+          <li><a href="#announce" class="nav-link flex items-center gap-3 p-3 rounded-lg hover:bg-blue-50 transition"> <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M18 8a6 6 0 0 0-12 0v7H4l4 4v-4h6v4l4-4h-2V8z" stroke-linecap="round" stroke-linejoin="round"></path></svg> Announcements</a></li>
+          <li><a href="#settings" class="nav-link flex items-center gap-3 p-3 rounded-lg hover:bg-blue-50 transition"> <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 15.5A3.5 3.5 0 1 0 12 8.5a3.5 3.5 0 0 0 0 7z" stroke-linecap="round" stroke-linejoin="round"></path><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06A2 2 0 1 1 6.1 2.1l.06.06a1.65 1.65 0 0 0 1.82.33H8.1a1.65 1.65 0 0 0 1-1.51V1a2 2 0 0 1 4 0v.09c.06.58.46 1.05 1 1.51h.12c.71.34 1.42.43 2 .12l.06-.06A2 2 0 1 1 20 4.9l-.06.06a1.65 1.65 0 0 0-.33 1.82v.12c.34.71.43 1.42.12 2z" stroke-linecap="round" stroke-linejoin="round"></path></svg> Settings</a></li>
         </ul>
+      </nav>
+
+      <div class="pt-4">
+        <button id="logoutBtn" class="w-full bg-gradient-to-r from-blue-500 to-blue-600 text-white py-2 rounded-xl shadow hover:from-blue-600">Logout</button>
+      </div>
+
+      <p class="mt-auto text-xs text-slate-400">v1.0 • Built with ❤️</p>
+    </aside>
+
+    <!-- Main content -->
+    <main class="flex-1 p-6 md:py-10 md:px-12">
+      <!-- Top bar (desktop) -->
+      <div class="hidden md:flex items-center justify-between gap-6 mb-8">
+        <div class="flex items-center gap-8">
+          <div class="text-2xl font-bold">Welcome back, <span id="userFirst">Resident</span> 👋</div>
+          <div class="text-sm text-slate-500">Here's your property dashboard. Quick actions and latest updates at a glance.</div>
+        </div>
+        <div class="flex items-center gap-4">
+          <div class="relative">
+            <button id="notifBtn" class="p-2 rounded-md hover:bg-slate-100 relative">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M15 17h5l-1.405-1.405A2.032 2.032 0 0 1 18 14.158V11a6 6 0 1 0-12 0v3.159c0 .538-.214 1.055-.595 1.436L4 17h5" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+              <span id="notifCount" class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">0</span>
+            </button>
+            <div id="notifPanel" class="hidden absolute right-0 mt-2 w-80 bg-white rounded-xl shadow-lg p-4">
+              <h4 class="font-semibold">Notifications</h4>
+              <div id="notifList" class="mt-3 space-y-2 max-h-56 overflow-auto"></div>
+            </div>
+          </div>
+
+          <div class="relative">
+            <button id="profileBtn" class="flex items-center gap-2 p-1 rounded-md hover:bg-slate-100">
+              <div class="w-9 h-9 rounded-full bg-blue-500 text-white font-medium flex items-center justify-center">R</div>
+              <div class="text-sm text-slate-700">Profile</div>
+            </button>
+            <div id="profilePanel" class="hidden absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-lg p-3">
+              <div class="text-sm font-semibold">Resident Name</div>
+              <div class="text-xs text-slate-500 mb-3">Unit: A-101</div>
+              <button id="goProfile" class="w-full text-left py-2 rounded hover:bg-slate-50">View Profile</button>
+              <button id="goSettings" class="w-full text-left py-2 rounded hover:bg-slate-50">Settings</button>
+              <div class="border-t mt-2 pt-2"><button id="logoutBtn2" class="w-full text-left py-2 text-red-600">Logout</button></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Hero / Stats -->
+      <section id="home" class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+        <div class="lg:col-span-2 bg-gradient-to-tr from-white to-blue-50 p-6 rounded-2xl shadow-md glass fade-in">
+          <div class="flex items-start justify-between">
+            <div>
+              <h2 class="text-2xl font-bold">Good morning, <span id="userFull">Resident</span> —</h2>
+              <p class="text-slate-600 mt-1">You have <span id="dueCount" class="font-semibold text-blue-600">0</span> unpaid bills and <span id="openComplaints" class="font-semibold text-amber-600">0</span> open complaints.</p>
+            </div>
+            <div class="text-right">
+              <div class="text-xs text-slate-500">Next payment due</div>
+              <div id="nextDue" class="text-lg font-semibold">—</div>
+            </div>
+          </div>
+
+          <div class="mt-6 grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div class="p-4 rounded-xl bg-white border shadow-sm">
+              <div class="text-xs text-slate-500">Current Balance</div>
+              <div id="balance" class="text-xl font-bold mt-2">₱0.00</div>
+            </div>
+            <div class="p-4 rounded-xl bg-white border shadow-sm">
+              <div class="text-xs text-slate-500">This Month Charges</div>
+              <div id="monthCharges" class="text-xl font-bold mt-2">₱0.00</div>
+            </div>
+            <div class="p-4 rounded-xl bg-white border shadow-sm">
+              <div class="text-xs text-slate-500">Announcements</div>
+              <div id="announceCount" class="text-xl font-bold mt-2">0</div>
+            </div>
+          </div>
+
+          <div class="mt-6">
+            <h4 class="text-sm font-semibold text-slate-600 mb-2">Quick actions</h4>
+            <div class="flex gap-3 flex-wrap">
+              <button data-action="goBills" class="actionBtn px-4 py-2 rounded-xl bg-blue-500 text-white hover:scale-105 transition">View Bills</button>
+              <button data-action="goPay" class="actionBtn px-4 py-2 rounded-xl border border-blue-500 text-blue-600 hover:bg-blue-50 transition">Make Payment</button>
+              <button data-action="goComplaint" class="actionBtn px-4 py-2 rounded-xl bg-amber-400 text-white hover:scale-105 transition">Submit Complaint</button>
+              <button data-action="goCalendar" class="actionBtn px-4 py-2 rounded-xl bg-white border hover:shadow">Open Calendar</button>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Right column cards -->
+        <aside class="space-y-4">
+          <div class="p-4 rounded-2xl shadow-md bg-white">
+            <div class="flex items-center justify-between">
+              <div>
+                <div class="text-sm text-slate-500">Upcoming</div>
+                <div id="upcomingEvent" class="font-semibold">No upcoming events</div>
+              </div>
+              <button id="viewAllEvents" class="text-sm text-blue-600">View all</button>
+            </div>
+          </div>
+
+          <div class="p-4 rounded-2xl shadow-md bg-white">
+            <div class="text-sm text-slate-500">Unread Messages</div>
+            <div class="mt-3 text-lg font-semibold">0</div>
+          </div>
+
+          <div class="p-4 rounded-2xl shadow-md bg-white">
+            <div class="text-sm text-slate-500">Payments due</div>
+            <div id="dueListMini" class="mt-3 space-y-2 text-sm text-slate-700"></div>
+          </div>
+        </aside>
       </section>
 
-      <section id="announcements-panel" class="page-panel hidden">
-        <h2 class="text-2xl text-blue-700 font-bold mb-4">Announcements</h2>
-        <div class="bg-orange-50 p-4 rounded border border-orange-300">
-          <div class="font-bold text-orange-700">Pool Closure</div>
-          <div class="text-gray-700">The swimming pool will be closed for maintenance from Sept 25–28.</div>
+      <!-- Bills Section -->
+      <section id="bills" class="mb-8">
+        <div class="flex items-center justify-between mb-4">
+          <h3 class="text-lg font-bold">Bills</h3>
+          <div class="text-sm text-slate-500">You can preview and pay bills here</div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div class="col-span-1">
+            <div class="p-4 rounded-2xl bg-white shadow-sm">
+              <div class="flex items-center justify-between">
+                <div>
+                  <div class="text-sm text-slate-500">Latest Bill</div>
+                  <div id="latestBillName" class="font-semibold">—</div>
+                </div>
+                <div class="text-right">
+                  <div class="text-xs text-slate-400">Due</div>
+                  <div id="latestBillDue" class="font-semibold">—</div>
+                </div>
+              </div>
+              <div class="mt-4 flex items-center justify-between">
+                <div>
+                  <div class="text-slate-500 text-sm">Amount</div>
+                  <div id="latestBillAmt" class="text-xl font-bold">₱0.00</div>
+                </div>
+                <div class="flex gap-2">
+                  <button id="viewBillBtn" class="px-3 py-2 rounded-lg border hover:bg-blue-50">View</button>
+                  <button id="payBillBtn" class="px-3 py-2 rounded-lg bg-blue-600 text-white hover:scale-105">Pay</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-span-2">
+            <div class="p-4 rounded-2xl bg-white shadow-sm">
+              <h4 class="font-semibold mb-3">All Bills</h4>
+              <div id="billsTable" class="space-y-3 max-h-64 overflow-auto"></div>
+            </div>
+          </div>
         </div>
       </section>
 
-      <section id="settings-panel" class="page-panel hidden">
-        <h2 class="text-2xl text-blue-700 font-bold mb-4">Settings</h2>
-        <form class="space-y-4 max-w-md">
-          <label class="flex items-center space-x-3">
-            <input type="checkbox" class="accent-blue-600 rounded" checked>
-            <span class="font-medium">Email Notifications</span>
-          </label>
-          <label class="flex items-center space-x-3">
-            <input type="checkbox" class="accent-blue-600 rounded" checked>
-            <span class="font-medium">SMS Reminders</span>
-          </label>
+      <!-- Complaint Section -->
+      <section id="complaint" class="mb-8">
+        <div class="flex items-center justify-between mb-4">
+          <h3 class="text-lg font-bold">Submit a Complaint</h3>
+          <div class="text-sm text-slate-500">We'll notify the admin and track its progress</div>
+        </div>
+
+        <form id="complaintForm" class="p-4 rounded-2xl bg-white shadow-sm space-y-4">
+          <div>
+            <label class="text-sm text-slate-600">Category</label>
+            <select id="complaintCategory" class="w-full mt-2 p-3 border rounded-lg">
+              <option>Plumbing</option>
+              <option>Electrical</option>
+              <option>Cleaning</option>
+              <option>Noisy Neighbor</option>
+              <option>Other</option>
+            </select>
+          </div>
+          <div>
+            <label class="text-sm text-slate-600">Title</label>
+            <input id="complaintTitle" class="w-full mt-2 p-3 border rounded-lg" placeholder="e.g. Leaky faucet in bathroom" />
+          </div>
+          <div>
+            <label class="text-sm text-slate-600">Description</label>
+            <textarea id="complaintDesc" class="w-full mt-2 p-3 border rounded-lg" rows="4" placeholder="Describe the issue"></textarea>
+          </div>
+          <div class="flex items-center gap-3">
+            <button type="submit" class="px-4 py-2 bg-amber-400 text-white rounded-xl">Submit</button>
+            <button type="button" id="clearComplaint" class="px-4 py-2 border rounded-xl">Clear</button>
+            <div id="complaintMsg" class="text-sm text-green-600 ml-2"></div>
+          </div>
         </form>
       </section>
+
+      <!-- Calendar -->
+      <section id="calendar" class="mb-8">
+        <div class="flex items-center justify-between mb-4">
+          <h3 class="text-lg font-bold">Calendar</h3>
+          <div class="text-sm text-slate-500">Your upcoming booking & events</div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div class="md:col-span-2 p-4 rounded-2xl bg-white shadow-sm">
+            <div id="calendarContainer"></div>
+          </div>
+
+          <div class="p-4 rounded-2xl bg-white shadow-sm">
+            <h4 class="font-semibold">Events</h4>
+            <div id="eventsList" class="mt-3 space-y-2"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Announcements -->
+      <section id="announce" class="mb-8">
+        <div class="flex items-center justify-between mb-4">
+          <h3 class="text-lg font-bold">Announcements</h3>
+          <div class="text-sm text-slate-500">Latest from property management</div>
+        </div>
+
+        <div class="p-4 rounded-2xl bg-white shadow-sm">
+          <div id="announcementsList" class="space-y-3"></div>
+        </div>
+      </section>
+
+      <!-- Settings -->
+      <section id="settings" class="mb-8">
+        <div class="flex items-center justify-between mb-4">
+          <h3 class="text-lg font-bold">Settings</h3>
+          <div class="text-sm text-slate-500">Customize your dashboard experience</div>
+        </div>
+
+        <div class="p-4 rounded-2xl bg-white shadow-sm space-y-4">
+          <div class="flex items-center justify-between">
+            <div>
+              <div class="text-sm font-semibold">Dark Mode (visual only)</div>
+              <div class="text-xs text-slate-500">Toggle a dark UI shell</div>
+            </div>
+            <div>
+              <label class="inline-flex items-center">
+                <input id="darkToggle" type="checkbox" class="form-checkbox h-5 w-9" />
+              </label>
+            </div>
+          </div>
+
+          <div class="flex items-center justify-between">
+            <div>
+              <div class="text-sm font-semibold">Email Notifications</div>
+              <div class="text-xs text-slate-500">Receive email about bills & announcements</div>
+            </div>
+            <div>
+              <label class="inline-flex items-center">
+                <input id="emailToggle" type="checkbox" class="form-checkbox h-5 w-9" />
+              </label>
+            </div>
+          </div>
+
+          <div>
+            <button id="saveSettings" class="px-4 py-2 rounded-xl bg-blue-600 text-white">Save Settings</button>
+            <span id="saveMsg" class="ml-3 text-sm text-green-600"></span>
+          </div>
+        </div>
+      </section>
+
+      <!-- Footer -->
+      <footer class="mt-10 text-sm text-slate-500">© <span id="year"></span> ConFix • Property Management UI — made with Tailwind</footer>
     </main>
   </div>
 
-  <!-- Settings Floating Button -->
-  <button id="settings-fab" class="fixed bottom-8 right-8 bg-orange-400 hover:bg-orange-500 p-3 rounded-full shadow-xl text-white text-2xl sm:text-3xl z-20" aria-label="Settings">
-    ⚙️
-  </button>
+  <!-- Modals -->
+  <div id="modalRoot"></div>
 
   <script>
-    // MOBILE NAV
-    const menuBtn = document.getElementById('menu-btn');
-    const mobileMenu = document.getElementById('mobile-menu');
-    menuBtn.onclick = () => mobileMenu.classList.toggle('hidden');
+    // Simple local mock data
+    const state = {
+      user: { first: 'Raiden', full: 'Raiden Villapando', unit: 'A-101' },
+      bills: [
+        { id: 1, name: 'Condo Maintenance - July', due: '2025-07-15', amount: 2500.00, status: 'unpaid' },
+        { id: 2, name: 'Electricity - July', due: '2025-07-16', amount: 1200.50, status: 'paid' },
+        { id: 3, name: 'Water - July', due: '2025-07-20', amount: 300.25, status: 'unpaid' }
+      ],
+      complaints: [],
+      announcements: [
+        { id:1, title: 'Pool Maintenance', body: 'Pool closed for maintenance on Aug 3, 2025', date: '2025-08-01' },
+        { id:2, title: 'Fire Drill', body: 'Mandatory fire drill on Sep 10, 2025 9AM', date: '2025-09-01'}
+      ],
+      notifications: [
+        { id: 1, text: 'Your July maintenance fee is due.', read: false },
+        { id: 2, text: 'New announcement: Pool maintenance', read: false }
+      ],
+      events: [
+        { id:1, date: '2025-09-10', title: 'Fire Drill' }
+      ],
+      settings: { dark: false, emailNotif: true }
+    };
 
-    // SECTION NAVIGATION LOGIC
-    function showPanel(panelId) {
-      document.querySelectorAll('.page-panel').forEach(panel =>
-        panel.classList.add('hidden'));
-      document.getElementById(panelId + '-panel').classList.remove('hidden');
-      if (!mobileMenu.classList.contains('hidden')) mobileMenu.classList.add('hidden');
+    // Init UI
+    document.addEventListener('DOMContentLoaded', () => {
+      // populate user
+      document.getElementById('userFirst').textContent = state.user.first || 'Resident';
+      document.getElementById('userFull').textContent = state.user.full || 'Resident';
+      document.getElementById('year').textContent = new Date().getFullYear();
+      // counts
+      updateNotifications();
+      populateBills();
+      populateAnnouncements();
+      populateEvents();
+      populateStats();
+
+      // sidebar nav links
+      document.querySelectorAll('.nav-link').forEach(link => {
+        link.addEventListener('click', (e) => {
+          e.preventDefault();
+          const href = link.getAttribute('href');
+          document.querySelector(href).scrollIntoView({ behavior: 'smooth' });
+        });
+      });
+
+      // mobile menu
+      const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+      mobileMenuBtn.addEventListener('click', () => {
+        const side = document.getElementById('sidebar');
+        side.classList.toggle('hidden');
+      });
+
+      // notifications
+      document.getElementById('notifBtn').addEventListener('click', () => {
+        document.getElementById('notifPanel').classList.toggle('hidden');
+      });
+      document.getElementById('notifBtnMobile').addEventListener('click', () => {
+        document.getElementById('notifPanel').classList.toggle('hidden');
+      });
+
+      // profile
+      document.getElementById('profileBtn').addEventListener('click', () => {
+        document.getElementById('profilePanel').classList.toggle('hidden');
+      });
+
+      // quick actions
+      document.querySelectorAll('.actionBtn').forEach(b => {
+        b.addEventListener('click', (e) => {
+          const action = b.dataset.action;
+          if(action === 'goBills') document.querySelector('#bills').scrollIntoView({behavior:'smooth'});
+          if(action === 'goPay') openPayModal();
+          if(action === 'goComplaint') document.querySelector('#complaint').scrollIntoView({behavior:'smooth'});
+          if(action === 'goCalendar') document.querySelector('#calendar').scrollIntoView({behavior:'smooth'});
+        });
+      });
+
+      // view & pay buttons
+      document.getElementById('viewBillBtn').addEventListener('click', showLatestBill);
+      document.getElementById('payBillBtn').addEventListener('click', openPayModal);
+
+      // complaint form
+      document.getElementById('complaintForm').addEventListener('submit', (e) => {
+        e.preventDefault();
+        const cat = document.getElementById('complaintCategory').value;
+        const title = document.getElementById('complaintTitle').value.trim();
+        const desc = document.getElementById('complaintDesc').value.trim();
+        if(!title || !desc) { showTemp('complaintMsg','Please provide title & description', 'red'); return; }
+        state.complaints.push({ id: Date.now(), cat, title, desc, status: 'open', date: new Date().toISOString() });
+        document.getElementById('complaintForm').reset();
+        showTemp('complaintMsg','Complaint submitted', 'green');
+        populateStats();
+      });
+      document.getElementById('clearComplaint').addEventListener('click', () => {
+        document.getElementById('complaintForm').reset();
+      });
+
+      // settings
+      document.getElementById('darkToggle').checked = state.settings.dark;
+      document.getElementById('emailToggle').checked = state.settings.emailNotif;
+      document.getElementById('saveSettings').addEventListener('click', () => {
+        state.settings.dark = document.getElementById('darkToggle').checked;
+        state.settings.emailNotif = document.getElementById('emailToggle').checked;
+        applyDark(state.settings.dark);
+        showTemp('saveMsg','Saved', 'green');
+      });
+
+      // logout
+      document.getElementById('logoutBtn').addEventListener('click', fakeLogout);
+      document.getElementById('logoutBtn2').addEventListener('click', fakeLogout);
+
+      // profile panel actions
+      document.getElementById('goProfile').addEventListener('click', () => alert('Profile page would open (not implemented).'));
+      document.getElementById('goSettings').addEventListener('click', () => document.querySelector('#settings').scrollIntoView({behavior:'smooth'}));
+
+      // modal root click close
+      document.querySelector('#modalRoot').addEventListener('click', (e) => {
+        if(e.target.id === 'modalRoot') closeModal();
+      });
+
+      // small UI hooks
+      document.getElementById('viewAllEvents').addEventListener('click', () => document.querySelector('#calendar').scrollIntoView({behavior:'smooth'}));
+
+      // display year & populate mini lists
+      renderDueMini();
+    });
+
+    function updateNotifications(){
+      const unread = state.notifications.filter(n => !n.read).length;
+      document.getElementById('notifCount').textContent = unread;
+      document.getElementById('notifCountMobile').textContent = unread;
+      const list = document.getElementById('notifList');
+      list.innerHTML = '';
+      state.notifications.forEach(n => {
+        const el = document.createElement('div');
+        el.className = 'p-2 rounded hover:bg-slate-50';
+        el.textContent = n.text;
+        list.appendChild(el);
+      });
     }
 
-    document.querySelectorAll('.nav-link').forEach(link => {
-      link.addEventListener('click', e => {
-        const nav = link.getAttribute('data-nav');
-        if (nav) {
-          e.preventDefault();
-          showPanel(nav);
-        }
+    function populateBills(){
+      // latest
+      const latest = state.bills[0] || null;
+      if(latest){
+        document.getElementById('latestBillName').textContent = latest.name;
+        document.getElementById('latestBillDue').textContent = latest.due;
+        document.getElementById('latestBillAmt').textContent = formatMoney(latest.amount);
+      }
+
+      // table
+      const table = document.getElementById('billsTable');
+      table.innerHTML = '';
+      state.bills.forEach(b => {
+        const row = document.createElement('div');
+        row.className = 'flex items-center justify-between p-3 border rounded-lg';
+        row.innerHTML = `<div>
+          <div class=\"font-semibold\">${b.name}</div>
+          <div class=\"text-xs text-slate-500\">Due ${b.due} • ${b.status}</div>
+        </div>
+        <div class=\"text-right\"> <div class=\"font-semibold\">${formatMoney(b.amount)}</div>
+        <div class=\"mt-2 flex gap-2\"> <button class=\"px-3 py-1 rounded border viewBtn\" data-id=\"${b.id}\">View</button>
+        <button class=\"px-3 py-1 rounded bg-blue-600 text-white payBtn\" data-id=\"${b.id}\">Pay</button></div></div>`;
+        table.appendChild(row);
       });
-    });
 
-    // Default view: welcome
-    showPanel('welcome');
-    // Floating Settings
-    document.getElementById('settings-fab').onclick = () => showPanel('settings');
+      document.querySelectorAll('.viewBtn').forEach(btn => btn.addEventListener('click', (e) => {
+        const id = parseInt(e.target.dataset.id);
+        showBill(id);
+      }));
+      document.querySelectorAll('.payBtn').forEach(btn => btn.addEventListener('click', (e) => {
+        const id = parseInt(e.target.dataset.id);
+        openPayModal(id);
+      }));
+    }
 
-    // Payment Form Handler
-    document.getElementById('payment-form').addEventListener('submit', function(e) {
-      e.preventDefault();
-      document.getElementById('payment-success').classList.remove('hidden');
-    });
+    function populateAnnouncements(){
+      const list = document.getElementById('announcementsList');
+      list.innerHTML = '';
+      state.announcements.forEach(a => {
+        const el = document.createElement('div');
+        el.className = 'p-3 border rounded-lg';
+        el.innerHTML = `<div class=\"font-semibold\">${a.title}</div><div class=\"text-xs text-slate-500\">${a.date}</div><div class=\"mt-2\">${a.body}</div>`;
+        list.appendChild(el);
+      });
+      document.getElementById('announceCount').textContent = state.announcements.length;
+    }
 
-    // Complaint Form Handler
-    document.getElementById('complaint-form').addEventListener('submit', function(e) {
-      e.preventDefault();
-      document.getElementById('complaint-success').classList.remove('hidden');
-    });
+    function populateEvents(){
+      const events = document.getElementById('eventsList');
+      events.innerHTML = '';
+      state.events.forEach(ev => {
+        const el = document.createElement('div'); el.className='p-2 rounded border'; el.innerHTML = `<div class=\"font-semibold\">${ev.title}</div><div class=\"text-xs text-slate-500\">${ev.date}</div>`; events.appendChild(el);
+      });
+    }
+
+    function populateStats(){
+      const unpaid = state.bills.filter(b => b.status === 'unpaid').length;
+      const openComp = state.complaints.filter(c => c.status === 'open').length;
+      document.getElementById('dueCount').textContent = unpaid;
+      document.getElementById('openComplaints').textContent = openComp;
+      const next = state.bills.find(b => b.status === 'unpaid');
+      document.getElementById('nextDue').textContent = next ? next.due : '—';
+      const balance = state.bills.reduce((acc,b)=> acc + (b.status==='unpaid'?b.amount:0),0);
+      document.getElementById('balance').textContent = formatMoney(balance);
+      const monthCharges = state.bills.reduce((acc,b)=> acc + b.amount,0);
+      document.getElementById('monthCharges').textContent = formatMoney(monthCharges);
+      document.getElementById('dueListMini').innerHTML = state.bills.filter(b=>b.status==='unpaid').map(b=>`<div>${b.name} • ${formatMoney(b.amount)}</div>`).join('');
+    }
+
+    function formatMoney(n){ return '₱' + n.toFixed(2); }
+
+    function showLatestBill(){ if(state.bills[0]) showBill(state.bills[0].id); else alert('No bills'); }
+
+    function showBill(id){ const b = state.bills.find(x=>x.id===id); if(!b) return; openModal(`<div class=\"max-w-2xl p-6\"><h3 class=\"text-xl font-semibold\">${b.name}</h3><div class=\"text-sm text-slate-500\">Due ${b.due}</div><div class=\"mt-4 text-2xl font-bold\">${formatMoney(b.amount)}</div><div class=\"mt-6 flex gap-3\"><button onclick=\"openPayModal(${b.id})\" class=\"px-4 py-2 bg-blue-600 text-white rounded\">Pay now</button><button onclick=\"closeModal()\" class=\"px-4 py-2 border rounded\">Close</button></div></div>`); }
+
+    function openPayModal(billId){
+      const bill = state.bills.find(b=>b.id===billId) || state.bills[0] || { amount:0, name:'Payment' };
+      openModal(`<div class=\"max-w-md p-6\"><h3 class=\"text-xl font-semibold\">Pay ${bill.name}</h3><div class=\"text-sm text-slate-500\">Amount: <strong>${formatMoney(bill.amount)}</strong></div><form id=\"payForm\" class=\"mt-4 space-y-3\"><div><label class=\"text-sm\">Payment Method</label><select id=\"payMethod\" class=\"w-full p-3 border rounded\"><option>GCash</option><option>PayMaya</option><option>Bank Card</option></select></div><div id=\"payDetails\"><!-- dynamic --></div><div class=\"flex items-center gap-3\"><button type=\"submit\" class=\"px-4 py-2 bg-blue-600 text-white rounded\">Pay</button><button type=\"button\" onclick=\"closeModal()\" class=\"px-4 py-2 border rounded\">Cancel</button></div><div id=\"payMsg\" class=\"text-sm mt-2\"></div></form></div>`);
+
+      setTimeout(()=>{
+        const payForm = document.getElementById('payForm');
+        const payDetails = document.getElementById('payDetails');
+        function renderDetails(){
+          const m = document.getElementById('payMethod').value;
+          if(m==='GCash' || m==='PayMaya'){
+            payDetails.innerHTML = `<div><label class=\"text-sm\">Mobile Number</label><input id=\"pmNumber\" class=\"w-full p-3 border rounded\" placeholder=\"09xxxxxxxxx\" /></div><div><label class=\"text-sm\">Name</label><input id=\"pmName\" class=\"w-full p-3 border rounded\" placeholder=\"Card/Account name\" /></div>`;
+          } else {
+            payDetails.innerHTML = `<div><label class=\"text-sm\">Card Number</label><input id=\"cardNumber\" maxlength=\"19\" class=\"w-full p-3 border rounded\" placeholder=\"4242 4242 4242 4242\" /></div><div class=\"grid grid-cols-3 gap-2\"><input id=\"cardExp\" placeholder=\"MM/YY\" class=\"p-3 border rounded\" /><input id=\"cardCVV\" maxlength=\"4\" placeholder=\"CVV\" class=\"p-3 border rounded\" /><input id=\"cardName\" placeholder=\"Cardholder name\" class=\"p-3 border rounded col-span-1 md:col-span-1\" /></div>`;
+          }
+        }
+        document.getElementById('payMethod').addEventListener('change', renderDetails);
+        renderDetails();
+
+        payForm.addEventListener('submit', (e)=>{ e.preventDefault();
+          // very basic validation
+          const method = document.getElementById('payMethod').value;
+          if(method==='Bank Card'){
+            const num = document.getElementById('cardNumber').value.replace(/\s/g,'');
+            const cvv = document.getElementById('cardCVV').value.trim();
+            if(!/^[0-9]{13,19}$/.test(num)){ showTemp('payMsg','Invalid card number', 'red'); return; }
+            if(!/^[0-9]{3,4}$/.test(cvv)){ showTemp('payMsg','Invalid CVV', 'red'); return; }
+          } else {
+            const num = document.getElementById('pmNumber').value.trim();
+            if(!/^[0-9]{10,11}$/.test(num)){ showTemp('payMsg','Invalid mobile number', 'red'); return; }
+          }
+          // simulate payment success
+          showTemp('payMsg','Payment successful! Thank you.', 'green');
+          if(billId){ const bi = state.bills.find(b=>b.id===billId); if(bi) bi.status='paid'; populateBills(); populateStats(); }
+          setTimeout(()=> closeModal(), 1200);
+        });
+      }, 60);
+    }
+
+    function openModal(html){
+      const root = document.getElementById('modalRoot');
+      root.innerHTML = `<div id=\"modalRootInner\" class=\"fixed inset-0 bg-black/30 flex items-center justify-center p-4\"><div class=\"bg-white rounded-2xl shadow-xl w-full max-w-4xl\">${html}</div></div>`;
+      document.body.style.overflow = 'hidden';
+    }
+    function closeModal(){ document.getElementById('modalRoot').innerHTML=''; document.body.style.overflow = ''; }
+
+    function fakeLogout(){ alert('You have been logged out (simulated).'); }
+
+    function showTemp(id,msg,color){ const el = document.getElementById(id); el.textContent = msg; el.style.color = color==='green'?'#059669':'#dc2626'; setTimeout(()=>{ if(el) el.textContent=''; }, 2500); }
+
+    // Calendar render (simple)
+    function renderCalendar(){
+      const container = document.getElementById('calendarContainer');
+      const now = new Date();
+      const month = now.getMonth();
+      const year = now.getFullYear();
+      const first = new Date(year, month, 1).getDay();
+      const days = new Date(year, month+1, 0).getDate();
+      let html = `<div class=\"flex items-center justify-between mb-3\"><div class=\"font-semibold\">${now.toLocaleString('default',{month:'long'})} ${year}</div><div class=\"text-sm text-slate-500\">Today: ${now.toLocaleDateString()}</div></div>`;
+      html += '<div class=\"grid grid-cols-7 gap-1 text-xs text-slate-500\"><div class=\"text-center\">Sun</div><div class=\"text-center\">Mon</div><div class=\"text-center\">Tue</div><div class=\"text-center\">Wed</div><div class=\"text-center\">Thu</div><div class=\"text-center\">Fri</div><div class=\"text-center\">Sat</div></div>';
+      html += '<div class=\"grid grid-cols-7 gap-2 mt-2\">';
+      for(let i=0;i<first;i++) html += '<div></div>';
+      for(let d=1; d<=days; d++){
+        const dateStr = `${year}-${String(month+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+        const ev = state.events.find(e=>e.date===dateStr);
+        html += `<div class=\"p-2 rounded-lg text-sm ${ev? 'bg-blue-50 border border-blue-100':'hover:bg-slate-50'}\"><div class=\"font-semibold\">${d}</div>${ev?`<div class=\\"text-xs text-blue-600\\">${ev.title}</div>`:''}</div>`;
+      }
+      html += '</div>';
+      container.innerHTML = html;
+    }
+    renderCalendar();
+
+    // small helpers
+    function renderDueMini(){ document.getElementById('dueListMini').innerHTML = state.bills.filter(b=>b.status==='unpaid').map(b=> `<div>${b.name} • ${formatMoney(b.amount)}</div>`).join(''); }
+
   </script>
 </body>
 </html>
