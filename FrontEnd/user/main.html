@@ -1,133 +1,518 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ConFix - Property Management</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://kit.fontawesome.com/a2e0ad9e58.js" crossorigin="anonymous"></script>
-  <style>
-    /* Smooth page transitions */
-    * { transition: all 0.3s ease-in-out; }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ConFix - Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            light: '#5DA8FF',
+                            DEFAULT: '#1E88E5',
+                            dark: '#0D47A1'
+                        },
+                        secondary: {
+                            light: '#E3F2FD',
+                            DEFAULT: '#90CAF9',
+                            dark: '#42A5F5'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+        
+        * {
+            font-family: 'Poppins', sans-serif;
+            transition: all 0.3s ease;
+        }
+        
+        .card-hover {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .card-hover:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px -5px rgba(30, 136, 229, 0.3);
+        }
+        
+        .sidebar {
+            transition: all 0.3s ease;
+        }
+        
+        .notification-dot {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            width: 12px;
+            height: 12px;
+            background-color: #EF5350;
+            border-radius: 50%;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .animate-fade-in {
+            animation: fadeIn 0.5s ease forwards;
+        }
+        
+        .delay-100 { animation-delay: 0.1s; }
+        .delay-200 { animation-delay: 0.2s; }
+        .delay-300 { animation-delay: 0.3s; }
+        .delay-400 { animation-delay: 0.4s; }
+        
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+                position: fixed;
+                z-index: 50;
+                height: 100vh;
+            }
+            
+            .sidebar.open {
+                transform: translateX(0);
+            }
+            
+            .overlay {
+                display: none;
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background-color: rgba(0, 0, 0, 0.5);
+                z-index: 40;
+            }
+            
+            .overlay.open {
+                display: block;
+            }
+        }
+    </style>
 </head>
-<body class="bg-gradient-to-br from-blue-100 to-blue-200 flex flex-col min-h-screen">
-
-  <!-- Header -->
-  <header class="flex justify-between items-center bg-blue-900 text-white px-6 py-4 shadow-lg sticky top-0 z-50">
-    <div class="flex items-center space-x-2">
-      <div class="w-8 h-8 bg-white rounded-full flex items-center justify-center text-blue-900 font-bold">C</div>
-      <span class="text-xl font-bold tracking-wide">ConFix</span>
+<body class="bg-gray-50 min-h-screen flex">
+    <!-- Sidebar -->
+    <div class="sidebar bg-white w-64 shadow-lg flex flex-col">
+        <!-- Logo -->
+        <div class="p-5 border-b border-gray-200">
+            <div class="flex items-center space-x-2">
+                <div class="w-10 h-10 rounded-lg bg-primary-light flex items-center justify-center">
+                    <i class="fas fa-tools text-primary-dark text-xl"></i>
+                </div>
+                <h1 class="text-2xl font-bold text-primary-dark">ConFix</h1>
+            </div>
+        </div>
+        
+        <!-- Navigation -->
+        <div class="flex-1 p-4 overflow-y-auto">
+            <ul class="space-y-2">
+                <li>
+                    <a href="#" class="flex items-center p-3 rounded-lg bg-primary-light text-primary-dark font-medium">
+                        <i class="fas fa-home mr-3"></i>
+                        <span>Dashboard</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#" class="flex items-center p-3 rounded-lg text-gray-600 hover:bg-secondary-light hover:text-primary-dark">
+                        <i class="fas fa-file-invoice-dollar mr-3"></i>
+                        <span>View Bills</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#" class="flex items-center p-3 rounded-lg text-gray-600 hover:bg-secondary-light hover:text-primary-dark">
+                        <i class="fas fa-credit-card mr-3"></i>
+                        <span>Make Payment</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#" class="flex items-center p-3 rounded-lg text-gray-600 hover:bg-secondary-light hover:text-primary-dark">
+                        <i class="fas fa-comment-dots mr-3"></i>
+                        <span>Submit Complaint</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#" class="flex items-center p-3 rounded-lg text-gray-600 hover:bg-secondary-light hover:text-primary-dark">
+                        <i class="fas fa-calendar-alt mr-3"></i>
+                        <span>Calendar</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#" class="flex items-center p-3 rounded-lg text-gray-600 hover:bg-secondary-light hover:text-primary-dark">
+                        <i class="fas fa-bullhorn mr-3"></i>
+                        <span>Announcements</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#" class="flex items-center p-3 rounded-lg text-gray-600 hover:bg-secondary-light hover:text-primary-dark">
+                        <i class="fas fa-cog mr-3"></i>
+                        <span>Settings</span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+        
+        <!-- Footer on sidebar -->
+        <div class="p-4 border-t border-gray-200 text-xs text-gray-500">
+            <p>Developed by:</p>
+            <p class="font-medium mt-1">Raiden Villapando</p>
+            <p class="font-medium">Mharon Irvin Vergara</p>
+            <p class="font-medium">Yuan Philip Corteza</p>
+        </div>
     </div>
-    <nav class="space-x-6 hidden md:flex">
-      <a href="#dashboard" class="hover:text-blue-300">Dashboard</a>
-      <a href="#about" class="hover:text-blue-300">About</a>
-      <a href="#contact" class="hover:text-blue-300">Contact</a>
-      <a href="#profile" class="hover:text-blue-300">Profile</a>
-    </nav>
-  </header>
-
-  <!-- Welcome -->
-  <section class="text-center py-10 bg-white shadow-md">
-    <h1 id="welcomeText" class="text-3xl md:text-4xl font-bold text-blue-900">Welcome, John Doe</h1>
-    <p class="text-blue-700 mt-2">Manage your property with ease</p>
-  </section>
-
-  <!-- Dashboard -->
-  <main id="dashboard" class="flex-1 container mx-auto px-6 py-10 grid gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
     
-    <!-- Card Component -->
-    <div class="bg-white shadow-lg rounded-2xl p-6 text-center hover:scale-105 transform transition cursor-pointer">
-      <i class="fas fa-file-invoice text-blue-700 text-4xl mb-3"></i>
-      <h2 class="font-semibold text-lg text-blue-900">View Bills</h2>
+    <!-- Main Content -->
+    <div class="flex-1 flex flex-col overflow-hidden">
+        <!-- Header -->
+        <header class="bg-white shadow-sm z-10">
+            <div class="flex items-center justify-between p-4">
+                <!-- Mobile menu button -->
+                <button class="md:hidden text-primary-dark" id="menuBtn">
+                    <i class="fas fa-bars text-xl"></i>
+                </button>
+                
+                <!-- Page title -->
+                <h2 class="text-xl font-semibold text-gray-800 hidden md:block">Dashboard</h2>
+                
+                <!-- Right side -->
+                <div class="flex items-center space-x-4">
+                    <!-- Notifications -->
+                    <div class="relative">
+                        <button class="text-gray-600 hover:text-primary-dark">
+                            <i class="fas fa-bell text-xl"></i>
+                            <span class="notification-dot"></span>
+                        </button>
+                    </div>
+                    
+                    <!-- Profile -->
+                    <div class="relative" id="profileMenuBtn">
+                        <button class="flex items-center space-x-2">
+                            <div class="w-10 h-10 rounded-full bg-gradient-to-r from-primary-light to-primary-dark flex items-center justify-center text-white">
+                                <i class="fas fa-user"></i>
+                            </div>
+                            <span class="text-gray-700 hidden md:block">John Doe</span>
+                            <i class="fas fa-chevron-down text-gray-500 text-xs"></i>
+                        </button>
+                        
+                        <!-- Profile dropdown -->
+                        <div class="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg py-2 hidden z-20" id="profileMenu">
+                            <a href="#" class="block px-4 py-2 text-gray-700 hover:bg-gray-100">
+                                <i class="fas fa-user mr-2"></i> Profile
+                            </a>
+                            <a href="#" class="block px-4 py-2 text-gray-700 hover:bg-gray-100">
+                                <i class="fas fa-cog mr-2"></i> Settings
+                            </a>
+                            <hr class="my-2">
+                            <a href="#" class="block px-4 py-2 text-red-600 hover:bg-gray-100">
+                                <i class="fas fa-sign-out-alt mr-2"></i> Logout
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </header>
+        
+        <!-- Main content -->
+        <main class="flex-1 overflow-y-auto p-4 md:p-6 bg-gray-50">
+            <!-- Welcome banner -->
+            <div class="bg-gradient-to-r from-primary-light to-primary-dark rounded-xl shadow-md p-6 text-white mb-6 animate-fade-in">
+                <h1 class="text-2xl md:text-3xl font-bold mb-2">Welcome back, John Doe!</h1>
+                <p class="opacity-90">Here's what's happening with your account today.</p>
+            </div>
+            
+            <!-- Stats overview -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+                <div class="bg-white rounded-xl shadow-sm p-4 card-hover animate-fade-in delay-100">
+                    <div class="flex items-center">
+                        <div class="p-3 rounded-lg bg-blue-100 text-primary-dark mr-4">
+                            <i class="fas fa-file-invoice-dollar text-xl"></i>
+                        </div>
+                        <div>
+                            <p class="text-gray-500 text-sm">Pending Bills</p>
+                            <h3 class="text-xl font-bold">3</h3>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="bg-white rounded-xl shadow-sm p-4 card-hover animate-fade-in delay-200">
+                    <div class="flex items-center">
+                        <div class="p-3 rounded-lg bg-green-100 text-green-600 mr-4">
+                            <i class="fas fa-check-circle text-xl"></i>
+                        </div>
+                        <div>
+                            <p class="text-gray-500 text-sm">Resolved Issues</p>
+                            <h3 class="text-xl font-bold">12</h3>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="bg-white rounded-xl shadow-sm p-4 card-hover animate-fade-in delay-300">
+                    <div class="flex items-center">
+                        <div class="p-3 rounded-lg bg-yellow-100 text-yellow-600 mr-4">
+                            <i class="fas fa-clock text-xl"></i>
+                        </div>
+                        <div>
+                            <p class="text-gray-500 text-sm">Pending Requests</p>
+                            <h3 class="text-xl font-bold">2</h3>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="bg-white rounded-xl shadow-sm p-4 card-hover animate-fade-in delay-400">
+                    <div class="flex items-center">
+                        <div class="p-3 rounded-lg bg-purple-100 text-purple-600 mr-4">
+                            <i class="fas fa-calendar-alt text-xl"></i>
+                        </div>
+                        <div>
+                            <p class="text-gray-500 text-sm">Upcoming Events</p>
+                            <h3 class="text-xl font-bold">1</h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Main content grid -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <!-- Left column -->
+                <div class="lg:col-span-2 space-y-6">
+                    <!-- Recent Bills -->
+                    <div class="bg-white rounded-xl shadow-sm overflow-hidden animate-fade-in">
+                        <div class="border-b border-gray-200 p-4 flex justify-between items-center">
+                            <h3 class="font-semibold text-gray-800">Recent Bills</h3>
+                            <a href="#" class="text-primary-dark text-sm font-medium">View All</a>
+                        </div>
+                        <div class="p-4">
+                            <div class="flex justify-between items-center py-3 border-b border-gray-100">
+                                <div>
+                                    <h4 class="font-medium">Water Bill - March 2023</h4>
+                                    <p class="text-sm text-gray-500">Due: Apr 15, 2023</p>
+                                </div>
+                                <div class="text-right">
+                                    <p class="font-semibold">$125.50</p>
+                                    <span class="inline-block px-2 py-1 bg-red-100 text-red-600 rounded-full text-xs">Pending</span>
+                                </div>
+                            </div>
+                            
+                            <div class="flex justify-between items-center py-3 border-b border-gray-100">
+                                <div>
+                                    <h4 class="font-medium">Electricity Bill - March 2023</h4>
+                                    <p class="text-sm text-gray-500">Due: Apr 12, 2023</p>
+                                </div>
+                                <div class="text-right">
+                                    <p class="font-semibold">$89.75</p>
+                                    <span class="inline-block px-2 py-1 bg-red-100 text-red-600 rounded-full text-xs">Pending</span>
+                                </div>
+                            </div>
+                            
+                            <div class="flex justify-between items-center py-3">
+                                <div>
+                                    <h4 class="font-medium">Maintenance Fee - March 2023</h4>
+                                    <p class="text-sm text-gray-500">Paid: Mar 28, 2023</p>
+                                </div>
+                                <div class="text-right">
+                                    <p class="font-semibold">$50.00</p>
+                                    <span class="inline-block px-2 py-1 bg-green-100 text-green-600 rounded-full text-xs">Paid</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Submit Complaint -->
+                    <div class="bg-white rounded-xl shadow-sm overflow-hidden animate-fade-in">
+                        <div class="border-b border-gray-200 p-4">
+                            <h3 class="font-semibold text-gray-800">Submit a Complaint</h3>
+                        </div>
+                        <div class="p-4">
+                            <form>
+                                <div class="mb-4">
+                                    <label class="block text-gray-700 text-sm font-medium mb-2" for="subject">Subject</label>
+                                    <input type="text" id="subject" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-light" placeholder="What's the issue about?">
+                                </div>
+                                
+                                <div class="mb-4">
+                                    <label class="block text-gray-700 text-sm font-medium mb-2" for="description">Description</label>
+                                    <textarea id="description" rows="3" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-light" placeholder="Please describe the issue in detail"></textarea>
+                                </div>
+                                
+                                <div class="mb-4">
+                                    <label class="block text-gray-700 text-sm font-medium mb-2">Category</label>
+                                    <div class="grid grid-cols-2 gap-2">
+                                        <label class="flex items-center">
+                                            <input type="radio" name="category" class="mr-2 text-primary-dark"> Plumbing
+                                        </label>
+                                        <label class="flex items-center">
+                                            <input type="radio" name="category" class="mr-2 text-primary-dark"> Electrical
+                                        </label>
+                                        <label class="flex items-center">
+                                            <input type="radio" name="category" class="mr-2 text-primary-dark"> Structural
+                                        </label>
+                                        <label class="flex items-center">
+                                            <input type="radio" name="category" class="mr-2 text-primary-dark"> Other
+                                        </label>
+                                    </div>
+                                </div>
+                                
+                                <div class="mb-4">
+                                    <label class="block text-gray-700 text-sm font-medium mb-2" for="file">Upload Image (Optional)</label>
+                                    <input type="file" id="file" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-light">
+                                </div>
+                                
+                                <button type="submit" class="w-full bg-primary-dark text-white py-2 rounded-lg font-medium hover:bg-primary-light transition">Submit Complaint</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Right column -->
+                <div class="space-y-6">
+                    <!-- Calendar -->
+                    <div class="bg-white rounded-xl shadow-sm overflow-hidden animate-fade-in">
+                        <div class="border-b border-gray-200 p-4 flex justify-between items-center">
+                            <h3 class="font-semibold text-gray-800">Calendar</h3>
+                            <div class="flex space-x-2">
+                                <button class="text-gray-500 hover:text-primary-dark">
+                                    <i class="fas fa-chevron-left"></i>
+                                </button>
+                                <button class="text-gray-500 hover:text-primary-dark">
+                                    <i class="fas fa-chevron-right"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="p-4">
+                            <div class="text-center font-medium text-gray-700 mb-4">April 2023</div>
+                            <div class="grid grid-cols-7 gap-2 mb-2">
+                                <div class="text-center text-xs text-gray-500">Sun</div>
+                                <div class="text-center text-xs text-gray-500">Mon</div>
+                                <div class="text-center text-xs text-gray-500">Tue</div>
+                                <div class="text-center text-xs text-gray-500">Wed</div>
+                                <div class="text-center text-xs text-gray-500">Thu</div>
+                                <div class="text-center text-xs text-gray-500">Fri</div>
+                                <div class="text-center text-xs text-gray-500">Sat</div>
+                            </div>
+                            
+                            <div class="grid grid-cols-7 gap-2">
+                                <div class="text-center text-sm text-gray-400 py-1">26</div>
+                                <div class="text-center text-sm text-gray-400 py-1">27</div>
+                                <div class="text-center text-sm text-gray-400 py-1">28</div>
+                                <div class="text-center text-sm text-gray-400 py-1">29</div>
+                                <div class="text-center text-sm text-gray-400 py-1">30</div>
+                                <div class="text-center text-sm text-gray-400 py-1">31</div>
+                                <div class="text-center text-sm py-1">1</div>
+                                
+                                <div class="text-center text-sm py-1">2</div>
+                                <div class="text-center text-sm py-1">3</div>
+                                <div class="text-center text-sm py-1">4</div>
+                                <div class="text-center text-sm py-1">5</div>
+                                <div class="text-center text-sm py-1">6</div>
+                                <div class="text-center text-sm py-1">7</div>
+                                <div class="text-center text-sm py-1">8</div>
+                                
+                                <div class="text-center text-sm py-1">9</div>
+                                <div class="text-center text-sm py-1">10</div>
+                                <div class="text-center text-sm py-1">11</div>
+                                <div class="text-center text-sm py-1">12</div>
+                                <div class="text-center text-sm py-1">13</div>
+                                <div class="text-center text-sm py-1">14</div>
+                                <div class="text-center text-sm py-1">15</div>
+                                
+                                <div class="text-center text-sm py-1">16</div>
+                                <div class="text-center text-sm py-1">17</div>
+                                <div class="text-center text-sm py-1 bg-blue-50 text-primary-dark rounded-full font-medium">18</div>
+                                <div class="text-center text-sm py-1">19</div>
+                                <div class="text-center text-sm py-1">20</div>
+                                <div class="text-center text-sm py-1">21</div>
+                                <div class="text-center text-sm py-1">22</div>
+                                
+                                <div class="text-center text-sm py-1">23</div>
+                                <div class="text-center text-sm py-1">24</div>
+                                <div class="text-center text-sm py-1">25</div>
+                                <div class="text-center text-sm py-1">26</div>
+                                <div class="text-center text-sm py-1">27</div>
+                                <div class="text-center text-sm py-1">28</div>
+                                <div class="text-center text-sm py-1">29</div>
+                                
+                                <div class="text-center text-sm py-1">30</div>
+                                <div class="text-center text-sm text-gray-400 py-1">1</div>
+                                <div class="text-center text-sm text-gray-400 py-1">2</div>
+                                <div class="text-center text-sm text-gray-400 py-1">3</div>
+                                <div class="text-center text-sm text-gray-400 py-1">4</div>
+                                <div class="text-center text-sm text-gray-400 py-1">5</div>
+                                <div class="text-center text-sm text-gray-400 py-1">6</div>
+                            </div>
+                            
+                            <div class="mt-4 pt-4 border-t border-gray-100">
+                                <div class="flex items-center mb-2">
+                                    <div class="w-3 h-3 rounded-full bg-primary-dark mr-2"></div>
+                                    <p class="text-sm">Maintenance Day - Building Inspection</p>
+                                </div>
+                                <div class="flex items-center">
+                                    <div class="w-3 h-3 rounded-full bg-red-500 mr-2"></div>
+                                    <p class="text-sm">Bill Due Date</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Announcements -->
+                    <div class="bg-white rounded-xl shadow-sm overflow-hidden animate-fade-in">
+                        <div class="border-b border-gray-200 p-4 flex justify-between items-center">
+                            <h3 class="font-semibold text-gray-800">Announcements</h3>
+                            <a href="#" class="text-primary-dark text-sm font-medium">View All</a>
+                        </div>
+                        <div class="p-4">
+                            <div class="mb-4 pb-4 border-b border-gray-100">
+                                <div class="flex items-start mb-1">
+                                    <div class="p-2 bg-blue-100 rounded-lg mr-3">
+                                        <i class="fas fa-info-circle text-primary-dark"></i>
+                                    </div>
+                                    <div>
+                                        <h4 class="font-medium text-sm">Scheduled Water Maintenance</h4>
+                                        <p class="text-xs text-gray-500">Posted: Apr 10, 2023</p>
+                                    </div>
+                                </div>
+                                <p class="text-sm text-gray-600 mt-2">There will be a scheduled water maintenance on April 18, 2023 from 10:00 AM to 2:00 PM. Please store enough water for your needs.</p>
+                            </div>
+                            
+                            <div class="mb-4 pb-4 border-b border-gray-100">
+                                <div class="flex items-start mb-1">
+                                    <div class="p-2 bg-green-100 rounded-lg mr-3">
+                                        <i class="fas fa-check-circle text-green-600"></i>
+                                    </div>
+                                    <div>
+                                        <h4 class="font-medium text-sm">New Payment System</h4>
+                                        <p class="text-xs text-gray-500">Posted: Apr 5, 2023</p>
+                                    </div>
+                                </div>
+                                <p class="text-sm text-gray-600 mt-2">We've updated our payment system to make it easier for you to pay your bills online. Try it now!</p>
+                            </div>
+                            
+                            <div>
+                                <div class="flex items-start mb-1">
+                                    <div class="p-2 bg-yellow-100 rounded-lg mr-3">
+                                        <i class="fas fa-exclamation-triangle text-yellow-600"></i>
+                                    </div>
+                                    <div>
+                                        <h4 class="font-medium text-sm">Elevator Maintenance</h4>
+                                        <p class="text-xs text-gray-500">Posted: Apr 2, 2023</p>
+                                    </div>
+                                </div>
+                                <p class="text-sm text-gray-600 mt-2">The east elevator will be under maintenance from April 20-21, 2023. Please use the west elevator during this period.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
     </div>
-
-    <div class="bg-white shadow-lg rounded-2xl p-6 text-center hover:scale-105 transform transition cursor-pointer">
-      <i class="fas fa-credit-card text-blue-700 text-4xl mb-3"></i>
-      <h2 class="font-semibold text-lg text-blue-900">Make Payment</h2>
-    </div>
-
-    <div class="bg-white shadow-lg rounded-2xl p-6 text-center hover:scale-105 transform transition cursor-pointer">
-      <i class="fas fa-comment-dots text-blue-700 text-4xl mb-3"></i>
-      <h2 class="font-semibold text-lg text-blue-900">Submit Complaint</h2>
-    </div>
-
-    <div class="bg-white shadow-lg rounded-2xl p-6 text-center hover:scale-105 transform transition cursor-pointer">
-      <i class="fas fa-bell text-blue-700 text-4xl mb-3"></i>
-      <h2 class="font-semibold text-lg text-blue-900">Notifications</h2>
-    </div>
-
-    <div id="profile" class="bg-white shadow-lg rounded-2xl p-6 text-center hover:scale-105 transform transition cursor-pointer">
-      <i class="fas fa-user text-blue-700 text-4xl mb-3"></i>
-      <h2 class="font-semibold text-lg text-blue-900">Profile</h2>
-    </div>
-
-    <!-- Calendar -->
-    <div class="bg-white shadow-lg rounded-2xl p-6 text-center hover:scale-105 transform transition">
-      <i class="fas fa-calendar-alt text-blue-700 text-4xl mb-3"></i>
-      <h2 class="font-semibold text-lg text-blue-900 mb-3">Calendar</h2>
-      <div id="calendar" class="grid grid-cols-7 gap-2 text-sm text-gray-700"></div>
-    </div>
-
-    <div class="bg-white shadow-lg rounded-2xl p-6 text-center hover:scale-105 transform transition cursor-pointer">
-      <i class="fas fa-bullhorn text-blue-700 text-4xl mb-3"></i>
-      <h2 class="font-semibold text-lg text-blue-900">Announcements</h2>
-    </div>
-
-    <!-- Settings -->
-    <div class="bg-white shadow-lg rounded-2xl p-6 text-center hover:scale-105 transform transition">
-      <i class="fas fa-cog text-blue-700 text-4xl mb-3"></i>
-      <h2 class="font-semibold text-lg text-blue-900">Settings</h2>
-      <button onclick="logout()" class="mt-4 px-4 py-2 bg-blue-700 text-white rounded-lg hover:bg-blue-800">Logout</button>
-    </div>
-  </main>
-
-  <!-- About -->
-  <section id="about" class="bg-blue-100 py-12 px-6 text-center">
-    <h2 class="text-2xl font-bold text-blue-900">About ConFix</h2>
-    <p class="max-w-2xl mx-auto mt-4 text-gray-700">
-      ConFix is a property management solution designed to simplify living in condos and hotels.
-      It allows residents to manage bills, payments, complaints, schedules, and community updates in one place.
-    </p>
-  </section>
-
-  <!-- Contact -->
-  <section id="contact" class="py-12 px-6 text-center">
-    <h2 class="text-2xl font-bold text-blue-900">Contact Us</h2>
-    <p class="mt-4 text-gray-700">Email: support@confix.com | Phone: +63 900 000 000</p>
-  </section>
-
-  <!-- Footer -->
-  <footer class="bg-blue-900 text-white text-center py-6 mt-auto">
-    <p>Developers: Raiden Villapando, Mharon Irvin Vergara, Yuan Philip Cortez</p>
-    <p class="text-sm text-blue-300 mt-1">© 2025 ConFix. All rights reserved.</p>
-  </footer>
-
-  <script>
-    // Dynamic welcome
-    const userName = "John Doe"; // can replace with real session
-    document.getElementById("welcomeText").innerText = "Welcome, " + userName;
-
-    // Simple calendar generator
-    const calendar = document.getElementById("calendar");
-    const daysInMonth = new Date().getDate();
-    const today = new Date().getDate();
-
-    for (let i = 1; i <= 30; i++) {
-      const day = document.createElement("div");
-      day.className = "p-2 border rounded hover:bg-blue-200 cursor-pointer";
-      if (i === today) {
-        day.classList.add("bg-blue-700", "text-white");
-      }
-      day.innerText = i;
-      calendar.appendChild(day);
-    }
-
-    // Logout
-    function logout() {
-      alert("You have logged out successfully!");
-      location.reload();
-    }
-  </script>
-</body>
-</html>
+    
+    <!-- Mobile overlay -->
+    <div
