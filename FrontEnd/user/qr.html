@@ -6,6 +6,8 @@
     <title>ConFix - Dashboard</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/html5-qrcode@2.3.8/minified/html5-qrcode.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
     <style>
         .maintenance-indicator {
             position: absolute;
@@ -119,45 +121,44 @@
             from { opacity: 0; transform: translateY(10px); }
             to { opacity: 1; transform: translateY(0); }
         }
-        
+
         /* Notification Panel Styles */
         .notification-panel {
-            position: absolute;
-            top: 100%;
-            right: 0;
-            width: 360px;
+            position: fixed;
+            top: 0;
+            right: -400px;
+            width: 100%;
+            max-width: 400px;
+            height: 100vh;
             background: white;
-            border-radius: 8px;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            box-shadow: -5px 0 15px rgba(0,0,0,0.1);
+            transition: right 0.3s ease;
             z-index: 1000;
-            opacity: 0;
-            visibility: hidden;
-            transform: translateY(-10px);
-            transition: all 0.3s ease;
+            overflow-y: auto;
         }
         
         .notification-panel.active {
-            opacity: 1;
-            visibility: visible;
-            transform: translateY(0);
+            right: 0;
         }
         
-        .notification-header {
-            padding: 15px;
-            border-bottom: 1px solid #eee;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+        .notification-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 999;
+            display: none;
         }
         
-        .notification-list {
-            max-height: 400px;
-            overflow-y: auto;
+        .notification-overlay.active {
+            display: block;
         }
         
         .notification-item {
             padding: 15px;
-            border-bottom: 1px solid #f5f5f5;
+            border-bottom: 1px solid #eee;
             cursor: pointer;
             transition: background 0.2s;
         }
@@ -170,53 +171,116 @@
             background: #f0f7ff;
         }
         
-        .notification-icon {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-right: 12px;
-            flex-shrink: 0;
-        }
-        
-        .notification-content {
-            flex: 1;
+        .notification-item.unread .notification-title {
+            font-weight: 600;
         }
         
         .notification-time {
-            font-size: 12px;
+            font-size: 0.8rem;
             color: #888;
-            margin-top: 4px;
         }
         
-        .notification-footer {
-            padding: 15px;
+        /* QR Scanner Styles */
+        .qr-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            z-index: 2000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .qr-modal.active {
+            display: flex;
+        }
+        
+        .qr-container {
+            background: white;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 500px;
+            padding: 20px;
             text-align: center;
-            border-top: 1px solid #eee;
         }
         
-        .notification-footer a {
+        #qr-reader {
+            width: 100%;
+            margin: 20px 0;
+        }
+        
+        .scanner-instructions {
+            color: #666;
+            margin-bottom: 15px;
+        }
+        
+        .qr-tabs {
+            display: flex;
+            border-bottom: 1px solid #ddd;
+            margin-bottom: 20px;
+        }
+        
+        .qr-tab {
+            flex: 1;
+            padding: 10px;
+            text-align: center;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+        }
+        
+        .qr-tab.active {
+            border-bottom-color: #1E88E5;
             color: #1E88E5;
-            text-decoration: none;
-            font-weight: 500;
+            font-weight: 600;
         }
         
-        .notification-footer a:hover {
-            text-decoration: underline;
+        .qr-tab-content {
+            display: none;
         }
         
-        .notification-empty {
-            padding: 30px 15px;
-            text-align: center;
-            color: #888;
+        .qr-tab-content.active {
+            display: block;
         }
         
-        .notification-empty i {
-            font-size: 40px;
-            margin-bottom: 10px;
-            opacity: 0.5;
+        #qr-code-result {
+            margin: 20px 0;
+            padding: 10px;
+            background: #f5f5f5;
+            border-radius: 5px;
+            word-break: break-all;
+        }
+        
+        #generated-qr-code {
+            display: flex;
+            justify-content: center;
+            margin: 20px 0;
+        }
+        
+        /* Mobile Responsive Adjustments */
+        @media (max-width: 768px) {
+            .sidebar {
+                position: fixed;
+                left: -100%;
+                transition: left 0.3s ease;
+                z-index: 1001;
+                height: 100vh;
+            }
+            
+            .sidebar.active {
+                left: 0;
+            }
+            
+            .notification-panel {
+                max-width: 100%;
+            }
+            
+            .qr-container {
+                width: 95%;
+                margin: 10px;
+            }
         }
     </style>
     <script>
@@ -239,7 +303,6 @@
             }
         }
     </script>
-
 </head>
 <body class="bg-gray-50 min-h-screen flex">
     <!-- Sidebar -->
@@ -294,7 +357,13 @@
                     </a>
                 </li>
                 <li>
-                    <a href="settings.html" class="flex items-center p-3 rounded-lg text-gray-600 hover:bg-secondary-light hover:text-primary-dark">
+                    <a href="#" class="flex items-center p-3 rounded-lg text-gray-600 hover:bg-secondary-light hover:text-primary-dark" id="qrScannerBtn">
+                        <i class="fas fa-qrcode mr-3"></i>
+                        <span>QR Scanner</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#" class="flex items-center p-3 rounded-lg text-gray-600 hover:bg-secondary-light hover:text-primary-dark">
                         <i class="fas fa-cog mr-3"></i>
                         <span>Settings</span>
                     </a>
@@ -307,7 +376,7 @@
             <p>Developed by:</p>
             <p class="font-medium mt-1">Raiden Villapando</p>
             <p class="font-medium">Mharon Irvin Vergara</p>
-            <p class="font-medium">Yuan Philip Corteza</p>
+            <p class="font-medium">Yuan Philip Cortez</p>
         </div>
     </div>
     
@@ -326,96 +395,17 @@
                 
                 <!-- Right side -->
                 <div class="flex items-center space-x-4">
+                    <!-- QR Scanner Button -->
+                    <button class="text-gray-600 hover:text-primary-dark md:hidden" id="mobileQrScannerBtn">
+                        <i class="fas fa-qrcode text-xl"></i>
+                    </button>
+                    
                     <!-- Notifications -->
                     <div class="relative">
                         <button class="text-gray-600 hover:text-primary-dark" id="notificationBtn">
                             <i class="fas fa-bell text-xl"></i>
-                            <span class="notification-dot"></span>
+                            <span class="notification-dot" id="notificationDot"></span>
                         </button>
-                        
-                        <!-- Notification Panel -->
-                        <div class="notification-panel" id="notificationPanel">
-                            <div class="notification-header">
-                                <h3 class="font-semibold">Notifications</h3>
-                                <span class="text-sm text-gray-500">3 new</span>
-                            </div>
-                            
-                            <div class="notification-list">
-                                <!-- Notification Item 1 -->
-                                <div class="notification-item unread">
-                                    <div class="flex">
-                                        <div class="notification-icon bg-blue-100 text-blue-600">
-                                            <i class="fas fa-file-invoice-dollar"></i>
-                                        </div>
-                                        <div class="notification-content">
-                                            <h4 class="font-medium text-sm">Bill Payment Reminder</h4>
-                                            <p class="text-xs text-gray-600 mt-1">Your electricity bill of $89.75 is due in 2 days.</p>
-                                            <div class="notification-time">10 minutes ago</div>
-                                        </div>
-                                    </div>
-                                </div>
-                                
-                                <!-- Notification Item 2 -->
-                                <div class="notification-item unread">
-                                    <div class="flex">
-                                        <div class="notification-icon bg-yellow-100 text-yellow-600">
-                                            <i class="fas fa-tools"></i>
-                                        </div>
-                                        <div class="notification-content">
-                                            <h4 class="font-medium text-sm">Maintenance Scheduled</h4>
-                                            <p class="text-xs text-gray-600 mt-1">Electrical repair scheduled for tomorrow between 10 AM - 12 PM.</p>
-                                            <div class="notification-time">1 hour ago</div>
-                                        </div>
-                                    </div>
-                                </div>
-                                
-                                <!-- Notification Item 3 -->
-                                <div class="notification-item unread">
-                                    <div class="flex">
-                                        <div class="notification-icon bg-green-100 text-green-600">
-                                            <i class="fas fa-check-circle"></i>
-                                        </div>
-                                        <div class="notification-content">
-                                            <h4 class="font-medium text-sm">Complaint Resolved</h4>
-                                            <p class="text-xs text-gray-600 mt-1">Your plumbing issue has been resolved. Thank you for your patience.</p>
-                                            <div class="notification-time">3 hours ago</div>
-                                        </div>
-                                    </div>
-                                </div>
-                                
-                                <!-- Notification Item 4 -->
-                                <div class="notification-item">
-                                    <div class="flex">
-                                        <div class="notification-icon bg-purple-100 text-purple-600">
-                                            <i class="fas fa-bullhorn"></i>
-                                        </div>
-                                        <div class="notification-content">
-                                            <h4 class="font-medium text-sm">New Announcement</h4>
-                                            <p class="text-xs text-gray-600 mt-1">Quarterly building maintenance scheduled for October 5-7, 2025.</p>
-                                            <div class="notification-time">Yesterday</div>
-                                        </div>
-                                    </div>
-                                </div>
-                                
-                                <!-- Notification Item 5 -->
-                                <div class="notification-item">
-                                    <div class="flex">
-                                        <div class="notification-icon bg-red-100 text-red-600">
-                                            <i class="fas fa-exclamation-triangle"></i>
-                                        </div>
-                                        <div class="notification-content">
-                                            <h4 class="font-medium text-sm">Payment Overdue</h4>
-                                            <p class="text-xs text-gray-600 mt-1">Your water bill payment is overdue. Please make payment immediately.</p>
-                                            <div class="notification-time">2 days ago</div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <div class="notification-footer">
-                                <a href="#">View All Notifications</a>
-                            </div>
-                        </div>
                     </div>
                     
                     <!-- Profile -->
@@ -746,75 +736,137 @@
         </main>
     </div>
 
-    <script>
-        // Toggle profile menu
-        document.getElementById('profileMenuBtn').addEventListener('click', function() {
-            document.getElementById('profileMenu').classList.toggle('hidden');
-        });
+    <!-- Notification Panel -->
+    <div class="notification-overlay" id="notificationOverlay"></div>
+    <div class="notification-panel" id="notificationPanel">
+        <div class="p-4 border-b border-gray-200 flex justify-between items-center">
+            <h3 class="font-semibold text-gray-800">Notifications</h3>
+            <button class="text-gray-500 hover:text-gray-700" id="closeNotificationPanel">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="notification-list" id="notificationList">
+            <!-- Notifications will be populated here -->
+        </div>
+    </div>
 
-        // Close profile menu when clicking outside
-        document.addEventListener('click', function(event) {
-            const profileMenu = document.getElementById('profileMenu');
-            const profileMenuBtn = document.getElementById('profileMenuBtn');
+    <!-- QR Scanner Modal -->
+    <div class="qr-modal" id="qrModal">
+        <div class="qr-container">
+            <h3 class="text-lg font-semibold mb-2">QR Code Tools</h3>
             
-            if (!profileMenuBtn.contains(event.target) && !profileMenu.contains(event.target)) {
-                profileMenu.classList.add('hidden');
-            }
-        });
+            <div class="qr-tabs">
+                <div class="qr-tab active" data-tab="scanner">Scan QR Code</div>
+                <div class="qr-tab" data-tab="generator">Generate QR Code</div>
+            </div>
+            
+            <!-- Scanner Tab -->
+            <div class="qr-tab-content active" id="scanner-tab">
+                <p class="scanner-instructions">Point your camera at a QR code to scan it</p>
+                <div id="qr-reader"></div>
+                <div id="qr-reader-results"></div>
+                <div class="mt-4 flex justify-between">
+                    <button class="px-4 py-2 bg-gray-300 rounded-lg" id="closeQrModal">Close</button>
+                    <button class="px-4 py-2 bg-primary-dark text-white rounded-lg" id="scanResultAction" style="display: none;">View Details</button>
+                </div>
+            </div>
+            
+            <!-- Generator Tab -->
+            <div class="qr-tab-content" id="generator-tab">
+                <p class="scanner-instructions">Enter text or URL to generate a QR code</p>
+                <textarea id="qr-text" class="w-full p-2 border rounded mb-4" placeholder="Enter text or URL here..." rows="3"></textarea>
+                <button id="generate-qr" class="px-4 py-2 bg-primary-dark text-white rounded-lg mb-4">Generate QR Code</button>
+                <div id="generated-qr-code"></div>
+                <div class="mt-4">
+                    <button class="px-4 py-2 bg-gray-300 rounded-lg" id="closeQrModal2">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
 
-        // Notification functionality
+    <script>
+        // Sample notification data
+        const notifications = [
+            {
+                id: 1,
+                title: "New Bill Available",
+                message: "Your water bill for September is now available for viewing.",
+                time: "10 minutes ago",
+                read: false,
+                type: "bill"
+            },
+            {
+                id: 2,
+                title: "Maintenance Scheduled",
+                message: "Electrical maintenance is scheduled for tomorrow between 10 AM - 12 PM.",
+                time: "1 hour ago",
+                read: false,
+                type: "maintenance"
+            },
+            {
+                id: 3,
+                title: "Payment Received",
+                message: "Your payment of $125.50 has been received. Thank you!",
+                time: "2 days ago",
+                read: true,
+                type: "payment"
+            },
+            {
+                id: 4,
+                title: "Complaint Update",
+                message: "Your plumbing complaint has been assigned to a technician.",
+                time: "3 days ago",
+                read: true,
+                type: "complaint"
+            }
+        ];
+
+        // DOM elements
         const notificationBtn = document.getElementById('notificationBtn');
         const notificationPanel = document.getElementById('notificationPanel');
-        const notificationDot = document.querySelector('.notification-dot');
+        const notificationOverlay = document.getElementById('notificationOverlay');
+        const closeNotificationPanel = document.getElementById('closeNotificationPanel');
+        const notificationList = document.getElementById('notificationList');
+        const notificationDot = document.getElementById('notificationDot');
+        const qrScannerBtn = document.getElementById('qrScannerBtn');
+        const mobileQrScannerBtn = document.getElementById('mobileQrScannerBtn');
+        const qrModal = document.getElementById('qrModal');
+        const closeQrModal = document.getElementById('closeQrModal');
+        const closeQrModal2 = document.getElementById('closeQrModal2');
+        const scanResultAction = document.getElementById('scanResultAction');
+        const menuBtn = document.getElementById('menuBtn');
+        const sidebar = document.querySelector('.sidebar');
+        const profileMenuBtn = document.getElementById('profileMenuBtn');
+        const profileMenu = document.getElementById('profileMenu');
+        const qrTabs = document.querySelectorAll('.qr-tab');
+        const qrTabContents = document.querySelectorAll('.qr-tab-content');
+        const generateQrBtn = document.getElementById('generate-qr');
+        const qrText = document.getElementById('qr-text');
+        const generatedQrCode = document.getElementById('generated-qr-code');
 
-        // Toggle notification panel
-        notificationBtn.addEventListener('click', function(e) {
-            e.stopPropagation();
-            notificationPanel.classList.toggle('active');
-            
-            // Mark all notifications as read when panel is opened
-            if (notificationPanel.classList.contains('active')) {
-                const unreadItems = document.querySelectorAll('.notification-item.unread');
-                unreadItems.forEach(item => {
-                    item.classList.remove('unread');
-                });
-                
-                // Hide notification dot
+        // QR Scanner variables
+        let html5QrcodeScanner = null;
+
+        // Initialize notification panel
+        function initNotifications() {
+            // Check if there are unread notifications
+            const unreadCount = notifications.filter(n => !n.read).length;
+            if (unreadCount > 0) {
+                notificationDot.style.display = 'block';
+            } else {
                 notificationDot.style.display = 'none';
             }
-        });
-
-        // Close notification panel when clicking outside
-        document.addEventListener('click', function(event) {
-            if (!notificationPanel.contains(event.target) && !notificationBtn.contains(event.target)) {
-                notificationPanel.classList.remove('active');
-            }
-        });
-
-        // Handle notification item clicks
-        const notificationItems = document.querySelectorAll('.notification-item');
-        notificationItems.forEach(item => {
-            item.addEventListener('click', function() {
-                // In a real app, this would mark the notification as read and navigate to relevant page
-                this.classList.remove('unread');
+            
+            // Populate notification list
+            notificationList.innerHTML = '';
+            notifications.forEach(notification => {
+                const notificationItem = document.createElement('div');
+                notificationItem.className = `notification-item ${notification.read ? '' : 'unread'}`;
+                notificationItem.innerHTML = `
+                    <div class="notification-title">${notification.title}</div>
+                    <div class="notification-message text-sm text-gray-600 mt-1">${notification.message}</div>
+                    <div class="notification-time mt-2">${notification.time}</div>
+                `;
                 
-                // Example: Different actions based on notification type
-                const icon = this.querySelector('.notification-icon i');
-                if (icon.classList.contains('fa-file-invoice-dollar')) {
-                    // Navigate to bills page
-                    window.location.href = 'bills.html';
-                } else if (icon.classList.contains('fa-tools')) {
-                    // Navigate to calendar
-                    window.location.href = 'calendar.html';
-                } else if (icon.classList.contains('fa-check-circle')) {
-                    // Navigate to complaints page
-                    window.location.href = 'complaint.html';
-                }
-                
-                // Close the panel after clicking
-                notificationPanel.classList.remove('active');
-            });
-        });
-    </script>
-</body>
-</html>
+                notificationItem.addEventListener('click', () => {
+                    // Mark as read
