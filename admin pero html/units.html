@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>CONFIX - Units</title>
+    <link rel="icon" type="image/png" href="../public/favicon.png">
+    <script src="https://cdn.tailwindcss.com"></script>
+  </head>
+  <body class="min-h-screen bg-slate-50 text-slate-900">
+    <div class="flex min-h-screen">
+      <aside class="w-64 bg-slate-900 text-white hidden md:flex md:flex-col">
+        <div class="p-5 border-b border-white/10 flex items-center gap-3">
+          <img src="../public/favicon.png" class="w-12 h-12 rounded-xl ring-1 ring-white/10" alt="logo">
+          <div>
+            <h2 class="font-semibold text-lg leading-tight">CONFIX</h2>
+            <p class="text-white/60 text-xs">PROPERTY MANAGEMENT</p>
+          </div>
+        </div>
+        <nav class="p-3 space-y-1">
+          <a href="./index.html" class="nav-link block px-3 py-2 rounded-md hover:bg-white/10">Dashboard</a>
+          <a href="./units.html" class="nav-link block px-3 py-2 rounded-md">Units</a>
+          <a href="./complaints.html" class="nav-link block px-3 py-2 rounded-md hover:bg-white/10">Complaints</a>
+          <a href="./requests.html" class="nav-link block px-3 py-2 rounded-md hover:bg-white/10">Requests</a>
+          <a href="./reports.html" class="nav-link block px-3 py-2 rounded-md hover:bg-white/10">Reports</a>
+          <a href="./settings.html" class="nav-link block px-3 py-2 rounded-md hover:bg-white/10">Settings</a>
+        </nav>
+      </aside>
+      <main class="flex-1 flex flex-col">
+        <header class="h-16 bg-white border-b border-slate-200 flex items-center justify-between px-4 md:px-6">
+          <div>
+            <h1 class="font-semibold text-xl">Units Management</h1>
+            <p class="text-slate-500 text-sm">Manage all property units and tenant information</p>
+          </div>
+          <button id="addUnitBtn" class="bg-blue-700 hover:bg-blue-800 text-white px-4 py-2 rounded-md">Add Unit</button>
+        </header>
+      <section class="p-4 md:p-6 space-y-6">
+      <div class="bg-white rounded-lg p-4 shadow-sm">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+          <input class="col-span-2 w-full border rounded-md px-3 py-2" placeholder="Search by unit number, tenant name, or type...">
+          <select class="border rounded-md px-3 py-2">
+            <option>All Status</option>
+            <option>Occupied</option>
+            <option>Available</option>
+            <option>Maintenance</option>
+            <option>Reserved</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="bg-white rounded-lg p-4 shadow-sm overflow-x-auto">
+        <table class="min-w-full text-left text-sm">
+          <thead class="text-slate-500">
+            <tr>
+              <th class="p-2">Unit</th>
+              <th class="p-2">Floor</th>
+              <th class="p-2">Type</th>
+              <th class="p-2">Tenant</th>
+              <th class="p-2">Contact</th>
+              <th class="p-2">Status</th>
+              <th class="p-2">Move-in Date</th>
+              <th class="p-2">Rent</th>
+            </tr>
+          </thead>
+          <tbody id="unitsTable"></tbody>
+        </table>
+      </div>
+
+      <footer class="text-center text-xs text-slate-500">Static HTML export</footer>
+      </section>
+      </main>
+    </div>
+
+    <!-- Shared modals -->
+    <div id="notifModal" class="fixed inset-0 bg-black/40 hidden items-center justify-center p-4"><div class="bg-white rounded-lg w-full max-w-md p-4">Notifications<button class="float-right" onclick="hideModal('notifModal')">✕</button></div></div>
+    <div id="userModal" class="fixed inset-0 bg-black/40 hidden items-center justify-center p-4"><div class="bg-white rounded-lg w-full max-w-sm p-4">Account<button class="float-right" onclick="hideModal('userModal')">✕</button></div></div>
+
+    <!-- Add Unit Modal -->
+    <div id="unitModal" class="fixed inset-0 bg-black/40 hidden items-center justify-center p-4">
+      <div class="bg-white rounded-lg w-full max-w-2xl p-4">
+        <div class="flex items-center justify-between mb-3">
+          <h3 class="font-semibold">Add Unit</h3>
+          <button onclick="hideModal('unitModal')">✕</button>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+          <input id="u-number" class="border rounded-md px-3 py-2" placeholder="Number" />
+          <input id="u-floor" type="number" class="border rounded-md px-3 py-2" placeholder="Floor" />
+          <input id="u-type" class="border rounded-md px-3 py-2" placeholder="Type" />
+          <input id="u-tenant" class="border rounded-md px-3 py-2" placeholder="Tenant (optional)" />
+          <input id="u-contact" class="border rounded-md px-3 py-2" placeholder="Contact (optional)" />
+          <select id="u-status" class="border rounded-md px-3 py-2">
+            <option>Available</option>
+            <option>Occupied</option>
+            <option>Maintenance</option>
+            <option>Reserved</option>
+          </select>
+          <input id="u-movein" type="date" class="border rounded-md px-3 py-2" />
+          <input id="u-rent" type="number" class="border rounded-md px-3 py-2" placeholder="Rent" />
+        </div>
+        <div class="mt-4 flex justify-end gap-2">
+          <button class="px-3 py-2 border rounded-md" onclick="hideModal('unitModal')">Cancel</button>
+          <button id="saveUnitBtn" class="px-3 py-2 rounded-md bg-blue-700 text-white">Save</button>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      const data = [
+        { number: '12A', floor: 12, type: '2BR/2BA', tenant: 'Sarah Johnson', contact: '(555) 123-4567', status: 'Occupied', moveIn: '1/15/2023', rent: 2800 },
+        { number: '8B', floor: 8, type: '1BR/1BA', tenant: 'Mike Chen', contact: '(555) 234-5678', status: 'Occupied', moveIn: '3/20/2023', rent: 2200 },
+        { number: '5C', floor: 5, type: '3BR/2BA', tenant: 'Emma Davis', contact: '(555) 345-6789', status: 'Maintenance', moveIn: '-', rent: 3200 },
+      ];
+      const tbody = document.getElementById('unitsTable');
+      tbody.innerHTML = data.map(u => `
+        <tr class="border-t">
+          <td class="p-2 font-semibold">${u.number}</td>
+          <td class="p-2">${u.floor}</td>
+          <td class="p-2">${u.type}</td>
+          <td class="p-2">${u.tenant}</td>
+          <td class="p-2">${u.contact}</td>
+          <td class="p-2"><span class="rounded-full px-2 py-0.5 text-xs ${u.status==='Occupied'?'bg-emerald-100 text-emerald-700':u.status==='Maintenance'?'bg-amber-100 text-amber-700':'bg-blue-100 text-blue-700'}">${u.status}</span></td>
+          <td class="p-2">${u.moveIn}</td>
+          <td class="p-2 font-medium">$${u.rent.toLocaleString()}</td>
+        </tr>
+      `).join('');
+    </script>
+    <script src="./script.js"></script>
+  </body>
+  </html>
+
+

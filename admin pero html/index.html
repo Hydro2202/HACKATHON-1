@@ -1,0 +1,174 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>CONFIX - Dashboard</title>
+    <link rel="icon" type="image/png" href="../public/favicon.png">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+  </head>
+  <body class="min-h-screen bg-slate-50 text-slate-900">
+    <div class="flex min-h-screen">
+      <aside class="w-64 bg-slate-900 text-white hidden md:flex md:flex-col">
+        <div class="p-5 border-b border-white/10 flex items-center gap-3">
+          <img src="../public/favicon.png" class="w-12 h-12 rounded-xl ring-1 ring-white/10" alt="logo">
+          <div>
+            <h2 class="font-semibold text-lg leading-tight">CONFIX</h2>
+            <p class="text-white/60 text-xs">PROPERTY MANAGEMENT</p>
+          </div>
+        </div>
+        <nav class="p-3 space-y-1">
+          <a href="./index.html" class="nav-link block px-3 py-2 rounded-md">Dashboard</a>
+          <a href="./units.html" class="nav-link block px-3 py-2 rounded-md hover:bg-white/10">Units</a>
+          <a href="./complaints.html" class="nav-link block px-3 py-2 rounded-md hover:bg-white/10">Complaints</a>
+          <a href="./requests.html" class="nav-link block px-3 py-2 rounded-md hover:bg-white/10">Requests</a>
+          <a href="./reports.html" class="nav-link block px-3 py-2 rounded-md hover:bg-white/10">Reports</a>
+          <a href="./settings.html" class="nav-link block px-3 py-2 rounded-md hover:bg-white/10">Settings</a>
+        </nav>
+      </aside>
+      <main class="flex-1 flex flex-col">
+        <header class="h-16 bg-white border-b border-slate-200 flex items-center justify-between px-4 md:px-6">
+          <div>
+            <h1 class="font-semibold text-xl">Dashboard</h1>
+            <p class="text-slate-500 text-sm">Welcome back, Admin.</p>
+          </div>
+          <div class="flex items-center gap-2">
+            <button id="notifBtn" class="relative p-2 rounded-md hover:bg-slate-100">
+              <span class="i bell inline-block w-5 h-5">🔔</span>
+              <span id="notifDot" class="absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full bg-red-500"></span>
+            </button>
+            <button id="userBtn" class="p-2 rounded-md hover:bg-slate-100">👤</button>
+          </div>
+        </header>
+        <section class="p-4 md:p-6 space-y-6">
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4" data-widget>
+            <div class="bg-white rounded-lg p-4 shadow-sm">
+              <p class="text-slate-500 text-sm">Total Units</p>
+              <p class="text-3xl font-bold">190</p>
+              <p class="text-emerald-600 text-xs">+2 from last month</p>
+            </div>
+            <div class="bg-white rounded-lg p-4 shadow-sm">
+              <p class="text-slate-500 text-sm">Active Tenants</p>
+              <p class="text-3xl font-bold">142</p>
+              <p class="text-emerald-600 text-xs">74.7% occupancy</p>
+            </div>
+            <div class="bg-white rounded-lg p-4 shadow-sm">
+              <p class="text-slate-500 text-sm">Open Complaints</p>
+              <p class="text-3xl font-bold">23</p>
+              <p class="text-emerald-600 text-xs">-5 from yesterday</p>
+            </div>
+            <div class="bg-white rounded-lg p-4 shadow-sm">
+              <p class="text-slate-500 text-sm">Pending Requests</p>
+              <p class="text-3xl font-bold">16</p>
+              <p class="text-amber-600 text-xs">Avg. 2.3 days to resolve</p>
+            </div>
+          </div>
+          <div class="grid grid-cols-1 lg:grid-cols-3 gap-4" data-widget>
+            <div class="bg-white rounded-lg p-4 shadow-sm lg:col-span-2">
+              <h3 class="font-semibold mb-2">Occupancy Trend</h3>
+              <div class="h-56">
+                <canvas id="occupancyChart" height="220"></canvas>
+              </div>
+            </div>
+            <div class="bg-white rounded-lg p-4 shadow-sm">
+              <h3 class="font-semibold mb-2">Quick Actions</h3>
+              <div class="space-y-2">
+                <a href="./units.html" class="block p-3 rounded-md bg-blue-50 text-blue-700">Add New Unit</a>
+                <a href="./requests.html" class="block p-3 rounded-md bg-amber-50 text-amber-700">Schedule Maintenance</a>
+                <a href="./reports.html" class="block p-3 rounded-md bg-emerald-50 text-emerald-700">Generate Report</a>
+              </div>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-4" data-widget>
+            <div class="bg-white rounded-lg p-4 shadow-sm">
+              <h3 class="font-semibold mb-2">Complaints vs Requests</h3>
+              <div class="h-56">
+                <canvas id="crChart" height="220"></canvas>
+              </div>
+            </div>
+            <div class="bg-white rounded-lg p-4 shadow-sm">
+              <h3 class="font-semibold mb-2">Recent Activity</h3>
+              <ul class="text-sm space-y-2 text-slate-600">
+                <li>• Unit 12B submitted maintenance request</li>
+                <li>• Complaint resolved for Unit 5C</li>
+                <li>• Report generated: Monthly Occupancy</li>
+              </ul>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <!-- Notifications modal -->
+    <div id="notifModal" class="fixed inset-0 bg-black/40 hidden items-center justify-center p-4">
+      <div class="bg-white rounded-lg w-full max-w-md p-4 space-y-3">
+        <div class="flex items-center justify-between">
+          <h3 class="font-semibold">Notifications</h3>
+          <button class="px-2 py-1" onclick="hideModal('notifModal')">✕</button>
+        </div>
+        <div class="space-y-2 text-sm">
+          <div class="p-3 rounded-md bg-slate-50">New request submitted - Unit 12B</div>
+          <div class="p-3 rounded-md bg-slate-50">Monthly report ready - Reports</div>
+          <div class="p-3 rounded-md bg-slate-50">2 complaints awaiting review</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Account modal -->
+    <div id="userModal" class="fixed inset-0 bg-black/40 hidden items-center justify-center p-4">
+      <div class="bg-white rounded-lg w-full max-w-sm p-4 space-y-3">
+        <div class="flex items-center justify-between">
+          <h3 class="font-semibold">Account</h3>
+          <button class="px-2 py-1" onclick="hideModal('userModal')">✕</button>
+        </div>
+        <div class="space-y-2">
+          <a href="./settings.html" class="block px-3 py-2 rounded-md bg-slate-50">Settings</a>
+          <button class="w-full px-3 py-2 rounded-md bg-red-600 text-white" onclick="alert('Signed out (static demo)')">Sign out</button>
+        </div>
+      </div>
+    </div>
+
+    <script src="./script.js"></script>
+    <script>
+      // Charts data similar to the React app
+      const months = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"]
+      const occupancy = [85,88,92,89,94,91,92,90,93,95,94,96]
+      const complaints = [12,15,8,18,22,14,16,10,12,11,9,8]
+      const requests = [8,12,6,14,18,9,7,6,8,7,6,5]
+
+      const oc = document.getElementById('occupancyChart')
+      if (oc) new Chart(oc, {
+        type: 'line',
+        data: {
+          labels: months,
+          datasets: [{
+            label: 'Occupancy %',
+            data: occupancy,
+            borderColor: 'rgb(37, 99, 235)',
+            backgroundColor: 'rgba(37, 99, 235, 0.15)',
+            tension: 0.4,
+            fill: true,
+          }]
+        },
+        options: { scales: { y: { suggestedMin: 70, suggestedMax: 100 } }, plugins: { legend: { display: false } } }
+      })
+
+      const crc = document.getElementById('crChart')
+      if (crc) new Chart(crc, {
+        type: 'bar',
+        data: {
+          labels: months,
+          datasets: [
+            { label: 'Complaints', data: complaints, backgroundColor: 'rgba(239, 68, 68, 0.6)' },
+            { label: 'Requests', data: requests, backgroundColor: 'rgba(16, 185, 129, 0.6)' },
+          ]
+        },
+        options: { responsive: true, plugins: { legend: { position: 'top' } } }
+      })
+    </script>
+  </body>
+</html>
+
+

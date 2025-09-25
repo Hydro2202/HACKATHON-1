@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>CONFIX - Complaints</title>
+    <link rel="icon" type="image/png" href="../public/favicon.png">
+    <script src="https://cdn.tailwindcss.com"></script>
+  </head>
+  <body class="min-h-screen bg-slate-50 text-slate-900">
+    <div class="flex min-h-screen">
+      <aside class="w-64 bg-slate-900 text-white hidden md:flex md:flex-col">
+        <div class="p-5 border-b border-white/10 flex items-center gap-3">
+          <img src="../public/favicon.png" class="w-12 h-12 rounded-xl ring-1 ring-white/10" alt="logo">
+          <div>
+            <h2 class="font-semibold text-lg leading-tight">CONFIX</h2>
+            <p class="text-white/60 text-xs">PROPERTY MANAGEMENT</p>
+          </div>
+        </div>
+        <nav class="p-3 space-y-1">
+          <a href="./index.html" class="nav-link block px-3 py-2 rounded-md hover:bg-white/10">Dashboard</a>
+          <a href="./units.html" class="nav-link block px-3 py-2 rounded-md hover:bg-white/10">Units</a>
+          <a href="./complaints.html" class="nav-link block px-3 py-2 rounded-md">Complaints</a>
+          <a href="./requests.html" class="nav-link block px-3 py-2 rounded-md hover:bg-white/10">Requests</a>
+          <a href="./reports.html" class="nav-link block px-3 py-2 rounded-md hover:bg-white/10">Reports</a>
+          <a href="./settings.html" class="nav-link block px-3 py-2 rounded-md hover:bg-white/10">Settings</a>
+        </nav>
+      </aside>
+      <main class="flex-1 flex flex-col">
+        <header class="h-16 bg-white border-b border-slate-200 flex items-center justify-between px-4 md:px-6">
+          <div>
+            <h1 class="font-semibold text-xl">Complaints Management</h1>
+            <p class="text-slate-500 text-sm">Track and resolve tenant complaints</p>
+          </div>
+          <button id="addComplaintBtn" class="bg-blue-700 hover:bg-blue-800 text-white px-4 py-2 rounded-md">Add Complaint</button>
+        </header>
+      <section class="p-4 md:p-6 space-y-6">
+      <div class="bg-white rounded-lg p-4 shadow-sm overflow-x-auto">
+        <table class="min-w-full text-left text-sm">
+          <thead class="text-slate-500">
+            <tr>
+              <th class="p-2">ID</th>
+              <th class="p-2">Unit</th>
+              <th class="p-2">Tenant</th>
+              <th class="p-2">Category</th>
+              <th class="p-2">Title</th>
+              <th class="p-2">Priority</th>
+              <th class="p-2">Status</th>
+              <th class="p-2">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr class="border-t">
+              <td class="p-2 font-semibold">#1</td>
+              <td class="p-2">12A</td>
+              <td class="p-2">Sarah Johnson</td>
+              <td class="p-2"><span class="px-2 py-0.5 rounded-full text-xs border">Plumbing</span></td>
+              <td class="p-2">Kitchen sink leaking</td>
+              <td class="p-2"><span class="px-2 py-0.5 rounded-full text-xs bg-red-100 text-red-700">High</span></td>
+              <td class="p-2"><span class="px-2 py-0.5 rounded-full text-xs bg-red-100 text-red-700">Pending</span></td>
+              <td class="p-2"><button class="px-2 py-1 text-blue-700" onclick="alert('Open details')">View</button></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      </section>
+      </main>
+    </div>
+
+    <!-- Add Complaint Modal -->
+    <div id="complaintModal" class="fixed inset-0 bg-black/40 hidden items-center justify-center p-4">
+      <div class="bg-white rounded-lg w-full max-w-2xl p-4">
+        <div class="flex items-center justify-between mb-3">
+          <h3 class="font-semibold">Add Complaint</h3>
+          <button onclick="hideModal('complaintModal')">✕</button>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+          <input id="c-unit" class="border rounded-md px-3 py-2" placeholder="Unit" />
+          <input id="c-tenant" class="border rounded-md px-3 py-2" placeholder="Tenant" />
+          <input id="c-category" class="border rounded-md px-3 py-2" placeholder="Category" />
+          <input id="c-title" class="border rounded-md px-3 py-2 md:col-span-2" placeholder="Title" />
+        </div>
+        <div class="mt-4 flex justify-end gap-2">
+          <button class="px-3 py-2 border rounded-md" onclick="hideModal('complaintModal')">Cancel</button>
+          <button id="saveComplaintBtn" class="px-3 py-2 rounded-md bg-blue-700 text-white">Save</button>
+        </div>
+      </div>
+    </div>
+
+    <script src="./script.js"></script>
+  </body>
+  </html>
+
+

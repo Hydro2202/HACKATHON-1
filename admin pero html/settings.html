@@ -1,0 +1,156 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>CONFIX - Settings</title>
+    <link rel="icon" type="image/png" href="../public/favicon.png">
+    <script src="https://cdn.tailwindcss.com"></script>
+  </head>
+  <body class="min-h-screen bg-slate-50 text-slate-900">
+    <div class="flex min-h-screen">
+      <aside class="w-64 bg-slate-900 text-white hidden md:flex md:flex-col">
+        <div class="p-5 border-b border-white/10 flex items-center gap-3">
+          <img src="../public/favicon.png" class="w-12 h-12 rounded-xl ring-1 ring-white/10" alt="logo">
+          <div>
+            <h2 class="font-semibold text-lg leading-tight">CONFIX</h2>
+            <p class="text-white/60 text-xs">PROPERTY MANAGEMENT</p>
+          </div>
+        </div>
+        <nav class="p-3 space-y-1">
+          <a href="./index.html" class="nav-link block px-3 py-2 rounded-md hover:bg-white/10">Dashboard</a>
+          <a href="./units.html" class="nav-link block px-3 py-2 rounded-md hover:bg-white/10">Units</a>
+          <a href="./complaints.html" class="nav-link block px-3 py-2 rounded-md hover:bg-white/10">Complaints</a>
+          <a href="./requests.html" class="nav-link block px-3 py-2 rounded-md hover:bg-white/10">Requests</a>
+          <a href="./reports.html" class="nav-link block px-3 py-2 rounded-md hover:bg-white/10">Reports</a>
+          <a href="./settings.html" class="nav-link block px-3 py-2 rounded-md">Settings</a>
+        </nav>
+      </aside>
+      <main class="flex-1 flex flex-col">
+        <header class="h-16 bg-white border-b border-slate-200 flex items-center justify-between px-4 md:px-6">
+          <div>
+            <h1 class="font-semibold text-xl">Settings</h1>
+            <p class="text-slate-500 text-sm">Manage your condo management system preferences</p>
+          </div>
+        </header>
+
+        <section class="p-4 md:p-6 space-y-6">
+          <!-- Tabs -->
+          <div class="bg-white rounded-lg shadow-sm">
+            <div class="border-b border-slate-200 flex">
+              <button data-tab="general" class="tab-btn px-4 py-2 text-sm font-medium border-b-2 border-blue-600">General</button>
+              <button data-tab="notifications" class="tab-btn px-4 py-2 text-sm font-medium text-slate-500">Notifications</button>
+              <button data-tab="users" class="tab-btn px-4 py-2 text-sm font-medium text-slate-500">Users</button>
+              <button data-tab="property" class="tab-btn px-4 py-2 text-sm font-medium text-slate-500">Property</button>
+              <button data-tab="security" class="tab-btn px-4 py-2 text-sm font-medium text-slate-500">Security</button>
+            </div>
+
+            <!-- Tab panels -->
+            <div id="tab-general" class="p-6 space-y-6">
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <label class="text-sm font-medium">System Name</label>
+                  <input class="mt-1 w-full border rounded-md px-3 py-2" placeholder="CondoAdmin Management System" value="CONFIX" />
+                </div>
+                <div>
+                  <label class="text-sm font-medium">Timezone</label>
+                  <select class="mt-1 w-full border rounded-md px-3 py-2">
+                    <option>Eastern Standard Time</option>
+                    <option>Central Standard Time</option>
+                    <option>Mountain Standard Time</option>
+                    <option>Pacific Standard Time</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="text-sm font-medium">Default Language</label>
+                  <select class="mt-1 w-full border rounded-md px-3 py-2">
+                    <option>English</option>
+                    <option>Spanish</option>
+                    <option>French</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="text-sm font-medium">Currency</label>
+                  <select class="mt-1 w-full border rounded-md px-3 py-2">
+                    <option>USD ($)</option>
+                    <option>CAD ($)</option>
+                    <option>EUR (€)</option>
+                  </select>
+                </div>
+              </div>
+              <button class="bg-blue-700 hover:bg-blue-800 text-white px-4 py-2 rounded-md">Save General Settings</button>
+            </div>
+
+            <div id="tab-notifications" class="p-6 space-y-4 hidden">
+              <div class="flex items-center justify-between">
+                <div>
+                  <p class="font-medium">Email Notifications</p>
+                  <p class="text-sm text-slate-500">Receive notifications via email</p>
+                </div>
+                <input type="checkbox" checked class="h-5 w-5">
+              </div>
+              <div class="flex items-center justify-between">
+                <div>
+                  <p class="font-medium">Push Notifications</p>
+                  <p class="text-sm text-slate-500">Receive browser notifications</p>
+                </div>
+                <input type="checkbox" class="h-5 w-5">
+              </div>
+              <button class="bg-blue-700 hover:bg-blue-800 text-white px-4 py-2 rounded-md">Save Notification Settings</button>
+            </div>
+
+            <div id="tab-users" class="p-6 space-y-6 hidden">
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <label class="text-sm font-medium">Admin Name</label>
+                  <input class="mt-1 w-full border rounded-md px-3 py-2" placeholder="Admin User" value="Admin User" />
+                </div>
+                <div>
+                  <label class="text-sm font-medium">Admin Email</label>
+                  <input class="mt-1 w-full border rounded-md px-3 py-2" type="email" value="admin@condo.com" />
+                </div>
+              </div>
+              <button class="bg-blue-700 hover:bg-blue-800 text-white px-4 py-2 rounded-md">Save User Settings</button>
+            </div>
+
+            <div id="tab-property" class="p-6 space-y-6 hidden">
+              <div>
+                <label class="text-sm font-medium">Property Name</label>
+                <input class="mt-1 w-full border rounded-md px-3 py-2" value="Sunset Tower Condominiums" />
+              </div>
+              <button class="bg-blue-700 hover:bg-blue-800 text-white px-4 py-2 rounded-md">Save Property Settings</button>
+            </div>
+
+            <div id="tab-security" class="p-6 space-y-6 hidden">
+              <div class="flex items-center justify-between">
+                <div>
+                  <p class="font-medium">Require Complex Passwords</p>
+                  <p class="text-sm text-slate-500">Enforce strong passwords</p>
+                </div>
+                <input type="checkbox" checked class="h-5 w-5">
+              </div>
+              <button class="bg-blue-700 hover:bg-blue-800 text-white px-4 py-2 rounded-md">Save Security Settings</button>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <script>
+      // Simple tab switcher
+      const btns = document.querySelectorAll('.tab-btn')
+      function showTab(name){
+        document.querySelectorAll('[id^=tab-]').forEach(p=>p.classList.add('hidden'))
+        const el = document.getElementById('tab-'+name)
+        el && el.classList.remove('hidden')
+        btns.forEach(b=>b.classList.remove('border-blue-600','text-blue-700'))
+        const active = Array.from(btns).find(b=>b.dataset.tab===name)
+        if(active){ active.classList.add('border-blue-600','text-blue-700') }
+      }
+      btns.forEach(b=>b.addEventListener('click',()=>showTab(b.dataset.tab)))
+    </script>
+    <script src="./script.js"></script>
+  </body>
+  </html>
+
+
