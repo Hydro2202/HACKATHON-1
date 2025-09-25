@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+  <title>ConFix — Login</title>
+  <link rel="icon" type="image/png" href="logo.png">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="app" role="application" aria-label="ConFix login">
+    <div class="header">
+      <div class="logo" aria-hidden="true">
+        <img src="logo.png" alt="Confix Logo" style="width:32px;height:32px;border-radius:8px;background:#eaf6ff;object-fit:contain;" />
+      </div>
+      <div class="app-title">ConFix</div>
+    </div>
+
+    <div class="content">
+      <div class="login-wrap">
+        <div class="logo-big">
+          <div class="logo-image">
+            <img src="logo.png" alt="Confix Logo" style="width:54px;height:54px;object-fit:contain;border-radius:10px;" />
+          </div>
+          <div class="logo-text">ConFix</div>
+        </div>
+
+        <div class="muted">Maintenance & property issue tracker — login to continue</div>
+
+        <div class="field">
+          <label for="email">Email</label>
+          <input id="email" class="input" placeholder="you@property.com" autocomplete="username" type="email">
+        </div>
+
+        <div class="field">
+          <label for="password">Password</label>
+          <input id="password" type="password" class="input" placeholder="••••••" autocomplete="current-password">
+        </div>
+
+        <div class="button-group">
+          <button id="loginBtn" class="btn btn-primary">Sign in</button>
+          <button id="demoBtn" class="btn btn-ghost">Use Demo Account</button>
+        </div>
+
+        <div class="login-tip">
+          Tip: use <strong>demo</strong> to try the app. Login is client-side only for this prototype.
+        </div>
+      </div>
+
+      <div class="footer-text">
+        Built for mobile-first property maintenance workflows
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Simple client-side login for the prototype
+    const loginBtn = document.getElementById('loginBtn');
+    const demoBtn = document.getElementById('demoBtn');
+    const emailInput = document.getElementById('email');
+    const passwordInput = document.getElementById('password');
+
+    function doLogin(email, password) {
+      // very small validation
+      if (!email || !password) {
+        alert('Please enter email and password (or use Demo).');
+        return;
+      }
+      // For prototype: store a simple session token in localStorage
+      localStorage.setItem('confix_user', JSON.stringify({ email, name: email.split('@')[0] }));
+      // redirect to dashboard
+      window.location.href = 'dashboard.html';
+    }
+
+    // Login button click handler
+    loginBtn.addEventListener('click', () => {
+      doLogin(emailInput.value.trim(), passwordInput.value);
+    });
+
+    // Demo button click handler
+    demoBtn.addEventListener('click', () => {
+      // seed demo user and some sample data
+      localStorage.setItem('confix_user', JSON.stringify({ email: 'demo@property.com', name: 'DemoUser' }));
+      // sample items
+      const sample = [
+        { id: 'c-1', type: 'Complaint', title: 'Leaking faucet - Apt 2B', status: 'open', created: Date.now() },
+        { id: 'j-1', type: 'Job Order', title: 'Replace hallway light', status: 'inprogress', created: Date.now()-3600000 }
+      ];
+      localStorage.setItem('confix_items', JSON.stringify(sample));
+      localStorage.setItem('confix_situation', JSON.stringify([{time:Date.now(), text:'Water outage resolved in B-wing'}]));
+      window.location.href = 'dashboard.html';
+    });
+
+    // Allow form submission with Enter key
+    passwordInput.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') {
+        doLogin(emailInput.value.trim(), passwordInput.value);
+      }
+    });
+
+    // Auto-focus email field on page load for better UX
+    window.addEventListener('load', () => {
+      emailInput.focus();
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ConFix — Maintenance Dashboard</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect fill='%230877d4' width='100' height='100' rx='18'/%3E%3Cpath d='M30 55 L45 40 L70 65' stroke='white' stroke-width='6' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="dashboard.css">
+</head>
+<body>
+  <div class="app" role="main">
+    <div class="header">
+      <div class="logo" aria-hidden="true">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect x="1" y="1" width="22" height="22" rx="5" fill="#0877d4" opacity="0.2"/>
+          <path d="M6 12h6l3 3" stroke="#0877d4" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <div class="header-info">
+        <div class="app-title">ConFix</div>
+        <div class="app-subtitle">Maintenance Dashboard</div>
+      </div>
+      <div class="user-info">
+        <div class="welcome-text">Welcome, <span id="userName" class="user-name"></span></div>
+        <div class="profile-pic" id="profileInitial">M</div>
+      </div>
+    </div>
+
+    <div class="content" id="mainContent">
+      <!-- Quick stats -->
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-number" id="openComplaints">0</div>
+          <div class="stat-label">Tenant Complaints</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-number" id="pendingJobs">0</div>
+          <div class="stat-label">Job Orders</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-number" id="resolvedThisWeek">0</div>
+          <div class="stat-label">Resolved This Week</div>
+        </div>
+      </div>
+
+      <!-- Active Complaints & Jobs -->
+      <div class="card full-width">
+        <h3>📋 Active Cases</h3>
+        <div class="tabs">
+          <button class="tab-btn active" data-tab="complaints">Tenant Complaints (<span id="complaintsCount">0</span>)</button>
+          <button class="tab-btn" data-tab="jobs">Job Orders (<span id="jobsCount">0</span>)</button>
+        </div>
+        
+        <div id="complaintsTab" class="tab-content active">
+          <div id="complaintsList" class="list"></div>
+        </div>
+        
+        <div id="jobsTab" class="tab-content">
+          <div id="jobsList" class="list"></div>
+        </div>
+      </div>
+
+      <!-- Status Update Section -->
+      <div class="card full-width">
+        <h3>🔄 Update Case Status</h3>
+        <div class="status-update-controls">
+          <select id="selectItem" class="select full-width">
+            <option value="">Select complaint or job to update</option>
+          </select>
+          <select id="newStatus" class="select">
+            <option value="open">Open</option>
+            <option value="inprogress">In Progress</option>
+            <option value="onhold">On Hold</option>
+            <option value="resolved">Resolved</option>
+          </select>
+          <button id="updateStatus" class="btn btn-primary">Update Status</button>
+        </div>
+        <div class="field">
+          <label for="statusNotes">Status Notes</label>
+          <textarea id="statusNotes" class="textarea" placeholder="Add update notes..."></textarea>
+        </div>
+        <div id="statusLog" class="status-log"></div>
+      </div>
+
+      <!-- Quick Actions -->
+      <div class="card">
+        <h3>⚡ Quick Actions</h3>
+        <div class="quick-actions">
+          <button id="markInProgress" class="btn btn-primary">Mark Selected as In Progress</button>
+          <button id="markResolved" class="btn btn-primary">Mark Selected as Resolved</button>
+          <button id="loadExamples" class="btn btn-ghost">Load Example Data</button>
+        </div>
+      </div>
+
+      <!-- Recent Activity -->
+      <div class="card full-width">
+        <h3>📊 Recent Activity</h3>
+        <div id="recentActivity" class="activity-list"></div>
+      </div>
+    </div>
+
+    <!-- Bottom nav -->
+    <div class="bottom-nav" role="navigation" aria-label="Main">
+      <button class="nav-btn active" id="navHome" title="Dashboard">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M3 11.5L12 4l9 7.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M5 20V12h14v8" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <span>Dashboard</span>
+      </button>
+
+      <button class="nav-btn" id="navQR" title="QR Scanner">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect x="3" y="3" width="6" height="6" stroke="currentColor" stroke-width="1.6" rx="1"/>
+          <rect x="15" y="3" width="6" height="6" stroke="currentColor" stroke-width="1.6" rx="1"/>
+          <rect x="3" y="15" width="6" height="6" stroke="currentColor" stroke-width="1.6" rx="1"/>
+          <rect x="15" y="15" width="6" height="6" stroke="currentColor" stroke-width="1.6" rx="1"/>
+        </svg>
+        <span>QR Scan</span>
+      </button>
+
+      <button class="nav-btn" id="navProfile" title="Profile">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M12 12a4 4 0 100-8 4 4 0 000 8z" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M4 20a8 8 0 0116 0" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <span>Profile</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- QR Scanner Modal -->
+  <div id="qrModal" class="modal" style="display:none;">
+    <div class="modal-card card">
+      <div class="modal-header">
+        <div class="modal-title">QR Scanner</div>
+        <button id="closeQr" class="btn btn-ghost">Close</button>
+      </div>
+      <div id="qrContainer">
+        <div class="qr-video" id="qrVideoWrap">
+          <video id="qrVideo" autoplay playsinline style="width:100%;height:100%;object-fit:cover;"></video>
+          <canvas id="qrCanvas" style="display:none;"></canvas>
+        </div>
+        <div class="qr-controls">
+          <button id="startScan" class="btn btn-primary">Start Camera</button>
+          <input id="qrFile" type="file" accept="image/*" style="display:none;">
+          <button id="uploadImage" class="btn btn-ghost">Upload Image</button>
+        </div>
+        <div id="qrResult" class="qr-result"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Profile Modal -->
+  <div id="profileModal" class="modal" style="display:none;">
+    <div class="modal-card card">
+      <div class="modal-header">
+        <div class="modal-title">Profile</div>
+        <button id="closeProfile" class="btn btn-ghost">Close</button>
+      </div>
+      <div class="profile-info">
+        <div class="profile-avatar" id="profileAvatar">M</div>
+        <div class="profile-details">
+          <div id="profileEmail" class="profile-email"></div>
+          <div class="profile-role">Maintenance Staff</div>
+        </div>
+      </div>
+
+      <div class="profile-actions">
+        <button id="exportData" class="btn btn-primary full-width">Export Data (JSON)</button>
+        <button id="logoutBtn" class="btn btn-ghost full-width">Logout</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Notification toast -->
+  <div id="notification" class="notification hidden">
+    <span id="notificationText"></span>
+  </div>
+
+  <script src="dashboard.js"></script>
+</body>
+</html>

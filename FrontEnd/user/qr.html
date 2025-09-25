@@ -1,0 +1,872 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ConFix - Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/html5-qrcode@2.3.8/minified/html5-qrcode.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
+    <style>
+        .maintenance-indicator {
+            position: absolute;
+            bottom: 2px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+        }
+        
+        .tooltip {
+            position: absolute;
+            background: #333;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-size: 12px;
+            white-space: nowrap;
+            z-index: 1000;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.3s;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            margin-bottom: 5px;
+        }
+        
+        .tooltip::after {
+            content: '';
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            border-width: 5px 5px 0 5px;
+            border-style: solid;
+            border-color: #333 transparent transparent transparent;
+        }
+        
+        .calendar-day {
+            position: relative;
+            cursor: pointer;
+            height: 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .calendar-day:hover .tooltip {
+            opacity: 1;
+        }
+        
+        .maintenance-electricity {
+            background-color: #1E88E5;
+        }
+        
+        .maintenance-plumbing {
+            background-color: #4CAF50;
+        }
+        
+        .maintenance-elevator {
+            background-color: #FF9800;
+        }
+        
+        .maintenance-general {
+            background-color: #9C27B0;
+        }
+        
+        .bill-due {
+            background-color: #F44336;
+        }
+        
+        .notification-dot {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            width: 10px;
+            height: 10px;
+            background-color: #F44336;
+            border-radius: 50%;
+        }
+        
+        .card-hover:hover {
+            transform: translateY(-2px);
+            transition: transform 0.2s;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+        
+        .animate-fade-in {
+            animation: fadeIn 0.5s ease-in-out;
+        }
+        
+        .delay-100 {
+            animation-delay: 0.1s;
+        }
+        
+        .delay-200 {
+            animation-delay: 0.2s;
+        }
+        
+        .delay-300 {
+            animation-delay: 0.3s;
+        }
+        
+        .delay-400 {
+            animation-delay: 0.4s;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Notification Panel Styles */
+        .notification-panel {
+            position: fixed;
+            top: 0;
+            right: -400px;
+            width: 100%;
+            max-width: 400px;
+            height: 100vh;
+            background: white;
+            box-shadow: -5px 0 15px rgba(0,0,0,0.1);
+            transition: right 0.3s ease;
+            z-index: 1000;
+            overflow-y: auto;
+        }
+        
+        .notification-panel.active {
+            right: 0;
+        }
+        
+        .notification-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 999;
+            display: none;
+        }
+        
+        .notification-overlay.active {
+            display: block;
+        }
+        
+        .notification-item {
+            padding: 15px;
+            border-bottom: 1px solid #eee;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        
+        .notification-item:hover {
+            background: #f9f9f9;
+        }
+        
+        .notification-item.unread {
+            background: #f0f7ff;
+        }
+        
+        .notification-item.unread .notification-title {
+            font-weight: 600;
+        }
+        
+        .notification-time {
+            font-size: 0.8rem;
+            color: #888;
+        }
+        
+        /* QR Scanner Styles */
+        .qr-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            z-index: 2000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .qr-modal.active {
+            display: flex;
+        }
+        
+        .qr-container {
+            background: white;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 500px;
+            padding: 20px;
+            text-align: center;
+        }
+        
+        #qr-reader {
+            width: 100%;
+            margin: 20px 0;
+        }
+        
+        .scanner-instructions {
+            color: #666;
+            margin-bottom: 15px;
+        }
+        
+        .qr-tabs {
+            display: flex;
+            border-bottom: 1px solid #ddd;
+            margin-bottom: 20px;
+        }
+        
+        .qr-tab {
+            flex: 1;
+            padding: 10px;
+            text-align: center;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+        }
+        
+        .qr-tab.active {
+            border-bottom-color: #1E88E5;
+            color: #1E88E5;
+            font-weight: 600;
+        }
+        
+        .qr-tab-content {
+            display: none;
+        }
+        
+        .qr-tab-content.active {
+            display: block;
+        }
+        
+        #qr-code-result {
+            margin: 20px 0;
+            padding: 10px;
+            background: #f5f5f5;
+            border-radius: 5px;
+            word-break: break-all;
+        }
+        
+        #generated-qr-code {
+            display: flex;
+            justify-content: center;
+            margin: 20px 0;
+        }
+        
+        /* Mobile Responsive Adjustments */
+        @media (max-width: 768px) {
+            .sidebar {
+                position: fixed;
+                left: -100%;
+                transition: left 0.3s ease;
+                z-index: 1001;
+                height: 100vh;
+            }
+            
+            .sidebar.active {
+                left: 0;
+            }
+            
+            .notification-panel {
+                max-width: 100%;
+            }
+            
+            .qr-container {
+                width: 95%;
+                margin: 10px;
+            }
+        }
+    </style>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            light: '#5DA8FF',
+                            DEFAULT: '#1E88E5',
+                            dark: '#0D47A1'
+                        },
+                        secondary: {
+                            light: '#E3F2FD',
+                            DEFAULT: '#90CAF9',
+                            dark: '#42A5F5'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-gray-50 min-h-screen flex">
+    <!-- Sidebar -->
+    <div class="sidebar bg-white w-64 shadow-lg flex flex-col">
+        <!-- Logo -->
+        <div class="p-5 border-b border-gray-200">
+            <div class="flex items-center space-x-2">
+                <div class="w-10 h-10 rounded-lg bg-primary-light flex items-center justify-center">
+                    <i class="fas fa-tools text-primary-dark text-xl"></i>
+                </div>
+                <h1 class="text-2xl font-bold text-primary-dark">ConFix</h1>
+            </div>
+        </div>
+        
+        <!-- Navigation -->
+        <div class="flex-1 p-4 overflow-y-auto">
+            <ul class="space-y-2">
+                <li>
+                    <a href="#" class="flex items-center p-3 rounded-lg bg-primary-light text-primary-dark font-medium">
+                        <i class="fas fa-home mr-3"></i>
+                        <span>Dashboard</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="bills.html" class="flex items-center p-3 rounded-lg text-gray-600 hover:bg-secondary-light hover:text-primary-dark">
+                        <i class="fas fa-file-invoice-dollar mr-3"></i>
+                        <span>View Bills</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="payment.html" class="flex items-center p-3 rounded-lg text-gray-600 hover:bg-secondary-light hover:text-primary-dark">
+                        <i class="fas fa-credit-card mr-3"></i>
+                        <span>Make Payment</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="complaint.html" class="flex items-center p-3 rounded-lg text-gray-600 hover:bg-secondary-light hover:text-primary-dark">
+                        <i class="fas fa-comment-dots mr-3"></i>
+                        <span>Submit Complaint</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="calendar.html" class="flex items-center p-3 rounded-lg text-gray-600 hover:bg-secondary-light hover:text-primary-dark">
+                        <i class="fas fa-calendar-alt mr-3"></i>
+                        <span>Calendar</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="announce.html" class="flex items-center p-3 rounded-lg text-gray-600 hover:bg-secondary-light hover:text-primary-dark">
+                        <i class="fas fa-bullhorn mr-3"></i>
+                        <span>Announcements</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#" class="flex items-center p-3 rounded-lg text-gray-600 hover:bg-secondary-light hover:text-primary-dark" id="qrScannerBtn">
+                        <i class="fas fa-qrcode mr-3"></i>
+                        <span>QR Scanner</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#" class="flex items-center p-3 rounded-lg text-gray-600 hover:bg-secondary-light hover:text-primary-dark">
+                        <i class="fas fa-cog mr-3"></i>
+                        <span>Settings</span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+        
+        <!-- Footer on sidebar -->
+        <div class="p-4 border-t border-gray-200 text-xs text-gray-500">
+            <p>Developed by:</p>
+            <p class="font-medium mt-1">Raiden Villapando</p>
+            <p class="font-medium">Mharon Irvin Vergara</p>
+            <p class="font-medium">Yuan Philip Cortez</p>
+        </div>
+    </div>
+    
+    <!-- Main Content -->
+    <div class="flex-1 flex flex-col overflow-hidden">
+        <!-- Header -->
+        <header class="bg-white shadow-sm z-10">
+            <div class="flex items-center justify-between p-4">
+                <!-- Mobile menu button -->
+                <button class="md:hidden text-primary-dark" id="menuBtn">
+                    <i class="fas fa-bars text-xl"></i>
+                </button>
+                
+                <!-- Page title -->
+                <h2 class="text-xl font-semibold text-gray-800 hidden md:block">Dashboard</h2>
+                
+                <!-- Right side -->
+                <div class="flex items-center space-x-4">
+                    <!-- QR Scanner Button -->
+                    <button class="text-gray-600 hover:text-primary-dark md:hidden" id="mobileQrScannerBtn">
+                        <i class="fas fa-qrcode text-xl"></i>
+                    </button>
+                    
+                    <!-- Notifications -->
+                    <div class="relative">
+                        <button class="text-gray-600 hover:text-primary-dark" id="notificationBtn">
+                            <i class="fas fa-bell text-xl"></i>
+                            <span class="notification-dot" id="notificationDot"></span>
+                        </button>
+                    </div>
+                    
+                    <!-- Profile -->
+                    <div class="relative" id="profileMenuBtn">
+                        <button class="flex items-center space-x-2">
+                            <div class="w-10 h-10 rounded-full bg-gradient-to-r from-primary-light to-primary-dark flex items-center justify-center text-white">
+                                <i class="fas fa-user"></i>
+                            </div>
+                            <span class="text-gray-700 hidden md:block">John Doe</span>
+                            <i class="fas fa-chevron-down text-gray-500 text-xs"></i>
+                        </button>
+                        
+                        <!-- Profile dropdown -->
+                        <div class="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg py-2 hidden z-20" id="profileMenu">
+                            <a href="#" class="block px-4 py-2 text-gray-700 hover:bg-gray-100">
+                                <i class="fas fa-user mr-2"></i> Profile
+                            </a>
+                            <a href="#" class="block px-4 py-2 text-gray-700 hover:bg-gray-100">
+                                <i class="fas fa-cog mr-2"></i> Settings
+                            </a>
+                            <hr class="my-2">
+                            <a href="#" class="block px-4 py-2 text-red-600 hover:bg-gray-100">
+                                <i class="fas fa-sign-out-alt mr-2"></i> Logout
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </header>
+        
+        <!-- Main content -->
+        <main class="flex-1 overflow-y-auto p-4 md:p-6 bg-gray-50">
+            <!-- Welcome banner -->
+            <div class="bg-gradient-to-r from-primary-light to-primary-dark rounded-xl shadow-md p-6 text-white mb-6 animate-fade-in">
+                <h1 class="text-2xl md:text-3xl font-bold mb-2">Welcome back, John Doe!</h1>
+                <p class="opacity-90">Today is September 24, 2025. Here's what's happening with your account today.</p>
+            </div>
+            
+            <!-- Stats overview -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+                <div class="bg-white rounded-xl shadow-sm p-4 card-hover animate-fade-in delay-100">
+                    <div class="flex items-center">
+                        <div class="p-3 rounded-lg bg-blue-100 text-primary-dark mr-4">
+                            <i class="fas fa-file-invoice-dollar text-xl"></i>
+                        </div>
+                        <div>
+                            <p class="text-gray-500 text-sm">Pending Bills</p>
+                            <h3 class="text-xl font-bold">3</h3>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="bg-white rounded-xl shadow-sm p-4 card-hover animate-fade-in delay-200">
+                    <div class="flex items-center">
+                        <div class="p-3 rounded-lg bg-green-100 text-green-600 mr-4">
+                            <i class="fas fa-check-circle text-xl"></i>
+                        </div>
+                        <div>
+                            <p class="text-gray-500 text-sm">Resolved Issues</p>
+                            <h3 class="text-xl font-bold">12</h3>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="bg-white rounded-xl shadow-sm p-4 card-hover animate-fade-in delay-300">
+                    <div class="flex items-center">
+                        <div class="p-3 rounded-lg bg-yellow-100 text-yellow-600 mr-4">
+                            <i class="fas fa-clock text-xl"></i>
+                        </div>
+                        <div>
+                            <p class="text-gray-500 text-sm">Pending Requests</p>
+                            <h3 class="text-xl font-bold">2</h3>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="bg-white rounded-xl shadow-sm p-4 card-hover animate-fade-in delay-400">
+                    <div class="flex items-center">
+                        <div class="p-3 rounded-lg bg-purple-100 text-purple-600 mr-4">
+                            <i class="fas fa-calendar-alt text-xl"></i>
+                        </div>
+                        <div>
+                            <p class="text-gray-500 text-sm">Upcoming Events</p>
+                            <h3 class="text-xl font-bold">1</h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Main content grid -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <!-- Left column -->
+                <div class="lg:col-span-2 space-y-6">
+                    <!-- Recent Bills -->
+                    <div class="bg-white rounded-xl shadow-sm overflow-hidden animate-fade-in">
+                        <div class="border-b border-gray-200 p-4 flex justify-between items-center">
+                            <h3 class="font-semibold text-gray-800">Recent Bills</h3>
+                            <a href="bills.html" class="text-primary-dark text-sm font-medium">View All</a>
+                        </div>
+                        <div class="p-4">
+                            <div class="flex justify-between items-center py-3 border-b border-gray-100">
+                                <div>
+                                    <h4 class="font-medium">Water Bill - August 2025</h4>
+                                    <p class="text-sm text-gray-500">Due: Sep 15, 2025</p>
+                                </div>
+                                <div class="text-right">
+                                    <p class="font-semibold">$125.50</p>
+                                    <span class="inline-block px-2 py-1 bg-red-100 text-red-600 rounded-full text-xs">Pending</span>
+                                </div>
+                            </div>
+                            
+                            <div class="flex justify-between items-center py-3 border-b border-gray-100">
+                                <div>
+                                    <h4 class="font-medium">Electricity Bill - August 2025</h4>
+                                    <p class="text-sm text-gray-500">Due: Sep 12, 2025</p>
+                                </div>
+                                <div class="text-right">
+                                    <p class="font-semibold">$89.75</p>
+                                    <span class="inline-block px-2 py-1 bg-red-100 text-red-600 rounded-full text-xs">Pending</span>
+                                </div>
+                            </div>
+                            
+                            <div class="flex justify-between items-center py-3">
+                                <div>
+                                    <h4 class="font-medium">Maintenance Fee - August 2025</h4>
+                                    <p class="text-sm text-gray-500">Paid: Aug 28, 2025</p>
+                                </div>
+                                <div class="text-right">
+                                    <p class="font-semibold">$50.00</p>
+                                    <span class="inline-block px-2 py-1 bg-green-100 text-green-600 rounded-full text-xs">Paid</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Submit Complaint -->
+                    <div class="bg-white rounded-xl shadow-sm overflow-hidden animate-fade-in">
+                        <div class="border-b border-gray-200 p-4">
+                            <h3 class="font-semibold text-gray-800">Submit a Complaint</h3>
+                        </div>
+                        <div class="p-4">
+                            <form>
+                                <div class="mb-4">
+                                    <label class="block text-gray-700 text-sm font-medium mb-2" for="subject">Subject</label>
+                                    <input type="text" id="subject" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-light" placeholder="What's the issue about?">
+                                </div>
+                                
+                                <div class="mb-4">
+                                    <label class="block text-gray-700 text-sm font-medium mb-2" for="description">Description</label>
+                                    <textarea id="description" rows="3" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-light" placeholder="Please describe the issue in detail"></textarea>
+                                </div>
+                                
+                                <div class="mb-4">
+                                    <label class="block text-gray-700 text-sm font-medium mb-2">Category</label>
+                                    <div class="grid grid-cols-2 gap-2">
+                                        <label class="flex items-center">
+                                            <input type="radio" name="category" class="mr-2 text-primary-dark"> Plumbing
+                                        </label>
+                                        <label class="flex items-center">
+                                            <input type="radio" name="category" class="mr-2 text-primary-dark"> Electrical
+                                        </label>
+                                        <label class="flex items-center">
+                                            <input type="radio" name="category" class="mr-2 text-primary-dark"> Structural
+                                        </label>
+                                        <label class="flex items-center">
+                                            <input type="radio" name="category" class="mr-2 text-primary-dark"> Other
+                                        </label>
+                                    </div>
+                                </div>
+                                
+                                <div class="mb-4">
+                                    <label class="block text-gray-700 text-sm font-medium mb-2" for="file">Upload Image (Optional)</label>
+                                    <input type="file" id="file" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-light">
+                                </div>
+                                
+                                <button type="submit" class="w-full bg-primary-dark text-white py-2 rounded-lg font-medium hover:bg-primary-light transition">Submit Complaint</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Right column -->
+                <div class="space-y-6">
+                    <!-- Calendar -->
+                    <div class="bg-white rounded-xl shadow-sm overflow-hidden animate-fade-in">
+                        <div class="border-b border-gray-200 p-4 flex justify-between items-center">
+                            <h3 class="font-semibold text-gray-800">Calendar</h3>
+                            <div class="flex space-x-2">
+                                <a href="calendar.html" class="text-primary-dark text-sm font-medium">View calendar</a>
+                            </div>
+                        </div>
+                        <div class="p-4">
+                            <div class="text-center font-medium text-gray-700 mb-4">September 2025</div>
+                            <div class="grid grid-cols-7 gap-1 mb-2 text-xs">
+                                <div class="text-center text-gray-500 font-medium">Sun</div>
+                                <div class="text-center text-gray-500 font-medium">Mon</div>
+                                <div class="text-center text-gray-500 font-medium">Tue</div>
+                                <div class="text-center text-gray-500 font-medium">Wed</div>
+                                <div class="text-center text-gray-500 font-medium">Thu</div>
+                                <div class="text-center text-gray-500 font-medium">Fri</div>
+                                <div class="text-center text-gray-500 font-medium">Sat</div>
+                            </div>
+                            
+                            <div class="grid grid-cols-7 gap-1 text-sm">
+                                <!-- Week 1 - August dates -->
+                                <div class="calendar-day text-gray-400">31</div>
+                                <!-- September 1-6 -->
+                                <div class="calendar-day">1</div>
+                                <div class="calendar-day">2</div>
+                                <div class="calendar-day">3</div>
+                                <div class="calendar-day">4</div>
+                                <div class="calendar-day">5</div>
+                                <div class="calendar-day">6</div>
+                                
+                                <!-- Week 2 -->
+                                <div class="calendar-day">7</div>
+                                <div class="calendar-day">8</div>
+                                <div class="calendar-day">9</div>
+                                <div class="calendar-day">10</div>
+                                <div class="calendar-day">11</div>
+                                <div class="calendar-day">
+                                    12
+                                    <div class="maintenance-indicator bill-due"></div>
+                                    <div class="tooltip">Electricity Bill Due</div>
+                                </div>
+                                <div class="calendar-day">13</div>
+                                
+                                <!-- Week 3 -->
+                                <div class="calendar-day">14</div>
+                                <div class="calendar-day">
+                                    15
+                                    <div class="maintenance-indicator bill-due"></div>
+                                    <div class="tooltip">Water Bill Due</div>
+                                </div>
+                                <div class="calendar-day">16</div>
+                                <div class="calendar-day">17</div>
+                                <div class="calendar-day">18</div>
+                                <div class="calendar-day">19</div>
+                                <div class="calendar-day">20</div>
+                                
+                                <!-- Week 4 -->
+                                <div class="calendar-day">21</div>
+                                <div class="calendar-day">22</div>
+                                <div class="calendar-day">23</div>
+                                <div class="calendar-day relative bg-blue-50 rounded-full font-medium text-primary-dark">
+                                    24
+                                    <span class="absolute top-0 right-0 text-xs bg-primary-dark text-white px-1 rounded">Today</span>
+                                    <div class="maintenance-indicator maintenance-electricity"></div>
+                                    <div class="tooltip">Emergency Electrical Repair</div>
+                                </div>
+                                <div class="calendar-day">25</div>
+                                <div class="calendar-day">26</div>
+                                <div class="calendar-day">27</div>
+                                
+                                <!-- Week 5 -->
+                                <div class="calendar-day">28</div>
+                                <div class="calendar-day">29</div>
+                                <div class="calendar-day">30</div>
+                                <!-- October dates -->
+                                <div class="calendar-day text-gray-400">1</div>
+                                <div class="calendar-day text-gray-400">2</div>
+                                <div class="calendar-day text-gray-400">3</div>
+                                <div class="calendar-day text-gray-400">4</div>
+                            </div>
+                            
+                            <div class="mt-4 pt-4 border-t border-gray-100">
+                                <div class="flex items-center mb-2">
+                                    <div class="w-3 h-3 rounded-full bg-primary-dark mr-2"></div>
+                                    <p class="text-sm">Maintenance Day - Electrical Repair (Today)</p>
+                                </div>
+                                <div class="flex items-center">
+                                    <div class="w-3 h-3 rounded-full bg-red-500 mr-2"></div>
+                                    <p class="text-sm">Bill Due Date</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Announcements -->
+                    <div class="bg-white rounded-xl shadow-sm overflow-hidden animate-fade-in">
+                        <div class="border-b border-gray-200 p-4 flex justify-between items-center">
+                            <h3 class="font-semibold text-gray-800">Announcements</h3>
+                            <a href="#" class="text-primary-dark text-sm font-medium">View All</a>
+                        </div>
+                        <div class="p-4">
+                            <div class="mb-4 pb-4 border-b border-gray-100">
+                                <div class="flex items-start mb-1">
+                                    <div class="p-2 bg-blue-100 rounded-lg mr-3">
+                                        <i class="fas fa-info-circle text-primary-dark"></i>
+                                    </div>
+                                    <div>
+                                        <h4 class="font-medium text-sm">Emergency Electrical Repair</h4>
+                                        <p class="text-xs text-gray-500">Posted: Sep 23, 2025</p>
+                                    </div>
+                                </div>
+                                <p class="text-sm text-gray-600 mt-2">Emergency electrical repair scheduled for September 24, 2025. Power may be interrupted for 2 hours between 10 AM - 12 PM.</p>
+                            </div>
+                            
+                            <div class="mb-4 pb-4 border-b border-gray-100">
+                                <div class="flex items-start mb-1">
+                                    <div class="p-2 bg-green-100 rounded-lg mr-3">
+                                        <i class="fas fa-check-circle text-green-600"></i>
+                                    </div>
+                                    <div>
+                                        <h4 class="font-medium text-sm">Quarterly Building Maintenance</h4>
+                                        <p class="text-xs text-gray-500">Posted: Sep 15, 2025</p>
+                                    </div>
+                                </div>
+                                <p class="text-sm text-gray-600 mt-2">Quarterly building maintenance scheduled for October 5-7, 2025. Please secure your belongings.</p>
+                            </div>
+                            
+                            <div>
+                                <div class="flex items-start mb-1">
+                                    <div class="p-2 bg-yellow-100 rounded-lg mr-3">
+                                        <i class="fas fa-exclamation-triangle text-yellow-600"></i>
+                                    </div>
+                                    <div>
+                                        <h4 class="font-medium text-sm">Elevator Maintenance</h4>
+                                        <p class="text-xs text-gray-500">Posted: Sep 10, 2025</p>
+                                    </div>
+                                </div>
+                                <p class="text-sm text-gray-600 mt-2">The east elevator will be under maintenance from September 28-29, 2025. Please use the west elevator during this period.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Notification Panel -->
+    <div class="notification-overlay" id="notificationOverlay"></div>
+    <div class="notification-panel" id="notificationPanel">
+        <div class="p-4 border-b border-gray-200 flex justify-between items-center">
+            <h3 class="font-semibold text-gray-800">Notifications</h3>
+            <button class="text-gray-500 hover:text-gray-700" id="closeNotificationPanel">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="notification-list" id="notificationList">
+            <!-- Notifications will be populated here -->
+        </div>
+    </div>
+
+    <!-- QR Scanner Modal -->
+    <div class="qr-modal" id="qrModal">
+        <div class="qr-container">
+            <h3 class="text-lg font-semibold mb-2">QR Code Tools</h3>
+            
+            <div class="qr-tabs">
+                <div class="qr-tab active" data-tab="scanner">Scan QR Code</div>
+                <div class="qr-tab" data-tab="generator">Generate QR Code</div>
+            </div>
+            
+            <!-- Scanner Tab -->
+            <div class="qr-tab-content active" id="scanner-tab">
+                <p class="scanner-instructions">Point your camera at a QR code to scan it</p>
+                <div id="qr-reader"></div>
+                <div id="qr-reader-results"></div>
+                <div class="mt-4 flex justify-between">
+                    <button class="px-4 py-2 bg-gray-300 rounded-lg" id="closeQrModal">Close</button>
+                    <button class="px-4 py-2 bg-primary-dark text-white rounded-lg" id="scanResultAction" style="display: none;">View Details</button>
+                </div>
+            </div>
+            
+            <!-- Generator Tab -->
+            <div class="qr-tab-content" id="generator-tab">
+                <p class="scanner-instructions">Enter text or URL to generate a QR code</p>
+                <textarea id="qr-text" class="w-full p-2 border rounded mb-4" placeholder="Enter text or URL here..." rows="3"></textarea>
+                <button id="generate-qr" class="px-4 py-2 bg-primary-dark text-white rounded-lg mb-4">Generate QR Code</button>
+                <div id="generated-qr-code"></div>
+                <div class="mt-4">
+                    <button class="px-4 py-2 bg-gray-300 rounded-lg" id="closeQrModal2">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Sample notification data
+        const notifications = [
+            {
+                id: 1,
+                title: "New Bill Available",
+                message: "Your water bill for September is now available for viewing.",
+                time: "10 minutes ago",
+                read: false,
+                type: "bill"
+            },
+            {
+                id: 2,
+                title: "Maintenance Scheduled",
+                message: "Electrical maintenance is scheduled for tomorrow between 10 AM - 12 PM.",
+                time: "1 hour ago",
+                read: false,
+                type: "maintenance"
+            },
+            {
+                id: 3,
+                title: "Payment Received",
+                message: "Your payment of $125.50 has been received. Thank you!",
+                time: "2 days ago",
+                read: true,
+                type: "payment"
+            },
+            {
+                id: 4,
+                title: "Complaint Update",
+                message: "Your plumbing complaint has been assigned to a technician.",
+                time: "3 days ago",
+                read: true,
+                type: "complaint"
+            }
+        ];
+
+        // DOM elements
+        const notificationBtn = document.getElementById('notificationBtn');
+        const notificationPanel = document.getElementById('notificationPanel');
+        const notificationOverlay = document.getElementById('notificationOverlay');
+        const closeNotificationPanel = document.getElementById('closeNotificationPanel');
+        const notificationList = document.getElementById('notificationList');
+        const notificationDot = document.getElementById('notificationDot');
+        const qrScannerBtn = document.getElementById('qrScannerBtn');
+        const mobileQrScannerBtn = document.getElementById('mobileQrScannerBtn');
+        const qrModal = document.getElementById('qrModal');
+        const closeQrModal = document.getElementById('closeQrModal');
+        const closeQrModal2 = document.getElementById('closeQrModal2');
+        const scanResultAction = document.getElementById('scanResultAction');
+        const menuBtn = document.getElementById('menuBtn');
+        const sidebar = document.querySelector('.sidebar');
+        const profileMenuBtn = document.getElementById('profileMenuBtn');
+        const profileMenu = document.getElementById('profileMenu');
+        const qrTabs = document.querySelectorAll('.qr-tab');
+        const qrTabContents = document.querySelectorAll('.qr-tab-content');
+        const generateQrBtn = document.getElementById('generate-qr');
+        const qrText = document.getElementById('qr-text');
+        const generatedQrCode = document.getElementById('generated-qr-code');
+
+        // QR Scanner variables
+        let html5QrcodeScanner = null;
+
+        // Initialize notification panel
+        function initNotifications() {
+            // Check if there are unread notifications
+            const unreadCount = notifications.filter(n => !n.read).length;
+            if (unreadCount > 0) {
+                notificationDot.style.display = 'block';
+            } else {
+                notificationDot.style.display = 'none';
+            }
+            
+            // Populate notification list
+            notificationList.innerHTML = '';
+            notifications.forEach(notification => {
+                const notificationItem = document.createElement('div');
+                notificationItem.className = `notification-item ${notification.read ? '' : 'unread'}`;
+                notificationItem.innerHTML = `
+                    <div class="notification-title">${notification.title}</div>
+                    <div class="notification-message text-sm text-gray-600 mt-1">${notification.message}</div>
+                    <div class="notification-time mt-2">${notification.time}</div>
+                `;
+                
+                notificationItem.addEventListener('click', () => {
+                    // Mark as read

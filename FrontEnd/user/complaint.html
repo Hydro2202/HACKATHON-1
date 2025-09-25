@@ -1,0 +1,875 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ConFix - Submit Complaint</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .maintenance-indicator {
+            position: absolute;
+            bottom: 2px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+        }
+        
+        .tooltip {
+            position: absolute;
+            background: #333;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-size: 12px;
+            white-space: nowrap;
+            z-index: 1000;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.3s;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            margin-bottom: 5px;
+        }
+        
+        .calendar-day {
+            position: relative;
+            cursor: pointer;
+            height: 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .calendar-day:hover .tooltip {
+            opacity: 1;
+        }
+        
+        .maintenance-electricity {
+            background-color: #1E88E5;
+        }
+        
+        .maintenance-plumbing {
+            background-color: #4CAF50;
+        }
+        
+        .maintenance-elevator {
+            background-color: #FF9800;
+        }
+        
+        .maintenance-general {
+            background-color: #9C27B0;
+        }
+        
+        .bill-due {
+            background-color: #F44336;
+        }
+        
+        .notification-dot {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            width: 10px;
+            height: 10px;
+            background-color: #F44336;
+            border-radius: 50%;
+        }
+        
+        .card-hover:hover {
+            transform: translateY(-2px);
+            transition: transform 0.2s;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+        
+        .animate-fade-in {
+            animation: fadeIn 0.5s ease-in-out;
+        }
+        
+        .delay-100 {
+            animation-delay: 0.1s;
+        }
+        
+        .delay-200 {
+            animation-delay: 0.2s;
+        }
+        
+        .delay-300 {
+            animation-delay: 0.3s;
+        }
+        
+        .delay-400 {
+            animation-delay: 0.4s;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        /* Complaint specific styles */
+        .complaint-success {
+            display: none;
+            background-color: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        
+        .complaint-error {
+            display: none;
+            background-color: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        
+        .complaint-processing {
+            display: none;
+            background-color: #cce5ff;
+            border: 1px solid #b8daff;
+            color: #004085;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        .priority-high {
+            background-color: #FEE2E2;
+            color: #DC2626;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        
+        .priority-medium {
+            background-color: #FEF3C7;
+            color: #D97706;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        
+        .priority-low {
+            background-color: #DCFCE7;
+            color: #16A34A;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        
+        .image-preview-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        
+        .image-preview {
+            position: relative;
+            width: 100px;
+            height: 100px;
+            border-radius: 8px;
+            overflow: hidden;
+            border: 1px solid #E5E7EB;
+        }
+        
+        .image-preview img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .remove-image {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 12px;
+        }
+        
+        .status-pending {
+            background-color: #FEF3C7;
+            color: #D97706;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        
+        .status-in-progress {
+            background-color: #DBEAFE;
+            color: #1D4ED8;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        
+        .status-resolved {
+            background-color: #DCFCE7;
+            color: #16A34A;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+    </style>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            light: '#5DA8FF',
+                            DEFAULT: '#1E88E5',
+                            dark: '#0D47A1'
+                        },
+                        secondary: {
+                            light: '#E3F2FD',
+                            DEFAULT: '#90CAF9',
+                            dark: '#42A5F5'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-gray-50 min-h-screen flex">
+    <!-- Sidebar -->
+    <div class="sidebar bg-white w-64 shadow-lg flex flex-col">
+        <!-- Logo -->
+        <div class="p-5 border-b border-gray-200">
+            <div class="flex items-center space-x-2">
+                <div class="w-10 h-10 rounded-lg bg-primary-light flex items-center justify-center">
+                    <i class="fas fa-tools text-primary-dark text-xl"></i>
+                </div>
+                <h1 class="text-2xl font-bold text-primary-dark">ConFix</h1>
+            </div>
+        </div>
+        
+        <!-- Navigation -->
+        <div class="flex-1 p-4 overflow-y-auto">
+            <ul class="space-y-2">
+                <li>
+                    <a href="dashboard.html" class="flex items-center p-3 rounded-lg text-gray-600 hover:bg-secondary-light hover:text-primary-dark">
+                        <i class="fas fa-home mr-3"></i>
+                        <span>Dashboard</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="bills.html" class="flex items-center p-3 rounded-lg text-gray-600 hover:bg-secondary-light hover:text-primary-dark">
+                        <i class="fas fa-file-invoice-dollar mr-3"></i>
+                        <span>View Bills</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="payment.html" class="flex items-center p-3 rounded-lg text-gray-600 hover:bg-secondary-light hover:text-primary-dark">
+                        <i class="fas fa-credit-card mr-3"></i>
+                        <span>Make Payment</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="complaint.html" class="flex items-center p-3 rounded-lg bg-primary-light text-primary-dark font-medium">
+                        <i class="fas fa-comment-dots mr-3"></i>
+                        <span>Submit Complaint</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="calendar.html" class="flex items-center p-3 rounded-lg text-gray-600 hover:bg-secondary-light hover:text-primary-dark">
+                        <i class="fas fa-calendar-alt mr-3"></i>
+                        <span>Calendar</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="announce.html" class="flex items-center p-3 rounded-lg text-gray-600 hover:bg-secondary-light hover:text-primary-dark">
+                        <i class="fas fa-bullhorn mr-3"></i>
+                        <span>Announcements</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="settings.html" class="flex items-center p-3 rounded-lg text-gray-600 hover:bg-secondary-light hover:text-primary-dark">
+                        <i class="fas fa-cog mr-3"></i>
+                        <span>Settings</span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+        
+        <!-- Footer on sidebar -->
+        <div class="p-4 border-t border-gray-200 text-xs text-gray-500">
+            <p>Developed by:</p>
+            <p class="font-medium mt-1">Raiden Villapando</p>
+            <p class="font-medium">Mharon Irvin Vergara</p>
+            <p class="font-medium">Yuan Philip Cortez</p>
+        </div>
+    </div>
+    
+    <!-- Main Content -->
+    <div class="flex-1 flex flex-col overflow-hidden">
+        <!-- Header -->
+        <header class="bg-white shadow-sm z-10">
+            <div class="flex items-center justify-between p-4">
+                <!-- Mobile menu button -->
+                <button class="md:hidden text-primary-dark" id="menuBtn">
+                    <i class="fas fa-bars text-xl"></i>
+                </button>
+                
+                <!-- Page title -->
+                <h2 class="text-xl font-semibold text-gray-800 hidden md:block">Submit Complaint</h2>
+                
+                <!-- Right side -->
+                <div class="flex items-center space-x-4">
+                    <!-- Notifications -->
+                    <div class="relative">
+                        <button class="text-gray-600 hover:text-primary-dark">
+                            <i class="fas fa-bell text-xl"></i>
+                            <span class="notification-dot"></span>
+                        </button>
+                    </div>
+                    
+                    <!-- Profile -->
+                    <div class="relative" id="profileMenuBtn">
+                        <button class="flex items-center space-x-2">
+                            <div class="w-10 h-10 rounded-full bg-gradient-to-r from-primary-light to-primary-dark flex items-center justify-center text-white">
+                                <i class="fas fa-user"></i>
+                            </div>
+                            <span class="text-gray-700 hidden md:block">John Doe</span>
+                            <i class="fas fa-chevron-down text-gray-500 text-xs"></i>
+                        </button>
+                        
+                        <!-- Profile dropdown -->
+                        <div class="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg py-2 hidden z-20" id="profileMenu">
+                            <a href="#" class="block px-4 py-2 text-gray-700 hover:bg-gray-100">
+                                <i class="fas fa-user mr-2"></i> Profile
+                            </a>
+                            <a href="#" class="block px-4 py-2 text-gray-700 hover:bg-gray-100">
+                                <i class="fas fa-cog mr-2"></i> Settings
+                            </a>
+                            <hr class="my-2">
+                            <a href="#" class="block px-4 py-2 text-red-600 hover:bg-gray-100">
+                                <i class="fas fa-sign-out-alt mr-2"></i> Logout
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </header>
+        
+        <!-- Main content -->
+        <main class="flex-1 overflow-y-auto p-4 md:p-6 bg-gray-50">
+            <!-- Status Messages -->
+            <div id="complaintSuccess" class="complaint-success">
+                <i class="fas fa-check-circle mr-2"></i> Complaint submitted successfully! Your complaint ID is <span id="complaintId"></span>.
+            </div>
+            
+            <div id="complaintError" class="complaint-error">
+                <i class="fas fa-exclamation-triangle mr-2"></i> <span id="errorMessage">There was an error submitting your complaint. Please try again.</span>
+            </div>
+            
+            <div id="complaintProcessing" class="complaint-processing">
+                <i class="fas fa-spinner fa-spin mr-2"></i> Submitting your complaint...
+            </div>
+            
+            <!-- Welcome banner -->
+            <div class="bg-gradient-to-r from-primary-light to-primary-dark rounded-xl shadow-md p-6 text-white mb-6 animate-fade-in">
+                <h1 class="text-2xl md:text-3xl font-bold mb-2">Submit a Complaint</h1>
+                <p class="opacity-90">Report issues with your property or request maintenance services.</p>
+            </div>
+            
+            <!-- Complaint Content -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <!-- Left column - Complaint Form -->
+                <div class="lg:col-span-2">
+                    <div class="bg-white rounded-xl shadow-sm overflow-hidden animate-fade-in">
+                        <div class="border-b border-gray-200 p-4">
+                            <h3 class="font-semibold text-gray-800">Complaint Details</h3>
+                        </div>
+                        <div class="p-4">
+                            <form id="complaintForm">
+                                <!-- Subject -->
+                                <div class="mb-4">
+                                    <label class="block text-gray-700 text-sm font-medium mb-2" for="subject">Subject</label>
+                                    <input type="text" id="subject" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-light" placeholder="What's the issue about?">
+                                </div>
+                                
+                                <!-- Description -->
+                                <div class="mb-4">
+                                    <label class="block text-gray-700 text-sm font-medium mb-2" for="description">Description</label>
+                                    <textarea id="description" rows="4" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-light" placeholder="Please describe the issue in detail"></textarea>
+                                    <p class="text-xs text-gray-500 mt-1">Please provide as much detail as possible to help us address your issue quickly.</p>
+                                </div>
+                                
+                                <!-- Category and Priority -->
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                                    <div>
+                                        <label class="block text-gray-700 text-sm font-medium mb-2">Category</label>
+                                        <div class="space-y-2">
+                                            <label class="flex items-center">
+                                                <input type="radio" name="category" value="plumbing" class="mr-2 text-primary-dark"> 
+                                                <i class="fas fa-faucet mr-2 text-blue-500"></i> Plumbing
+                                            </label>
+                                            <label class="flex items-center">
+                                                <input type="radio" name="category" value="electrical" class="mr-2 text-primary-dark"> 
+                                                <i class="fas fa-bolt mr-2 text-yellow-500"></i> Electrical
+                                            </label>
+                                            <label class="flex items-center">
+                                                <input type="radio" name="category" value="structural" class="mr-2 text-primary-dark"> 
+                                                <i class="fas fa-home mr-2 text-gray-500"></i> Structural
+                                            </label>
+                                            <label class="flex items-center">
+                                                <input type="radio" name="category" value="general" class="mr-2 text-primary-dark"> 
+                                                <i class="fas fa-tools mr-2 text-green-500"></i> General Maintenance
+                                            </label>
+                                            <label class="flex items-center">
+                                                <input type="radio" name="category" value="other" class="mr-2 text-primary-dark"> 
+                                                <i class="fas fa-question-circle mr-2 text-purple-500"></i> Other
+                                            </label>
+                                        </div>
+                                    </div>
+                                    
+                                    <div>
+                                        <label class="block text-gray-700 text-sm font-medium mb-2">Priority</label>
+                                        <div class="space-y-2">
+                                            <label class="flex items-center">
+                                                <input type="radio" name="priority" value="high" class="mr-2 text-primary-dark"> 
+                                                <span class="priority-high">High</span>
+                                                <span class="ml-2 text-xs text-gray-500">Emergency - requires immediate attention</span>
+                                            </label>
+                                            <label class="flex items-center">
+                                                <input type="radio" name="priority" value="medium" class="mr-2 text-primary-dark"> 
+                                                <span class="priority-medium">Medium</span>
+                                                <span class="ml-2 text-xs text-gray-500">Important - address within 2-3 days</span>
+                                            </label>
+                                            <label class="flex items-center">
+                                                <input type="radio" name="priority" value="low" class="mr-2 text-primary-dark"> 
+                                                <span class="priority-low">Low</span>
+                                                <span class="ml-2 text-xs text-gray-500">Routine - address when possible</span>
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Location -->
+                                <div class="mb-4">
+                                    <label class="block text-gray-700 text-sm font-medium mb-2" for="location">Location</label>
+                                    <input type="text" id="location" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-light" placeholder="Where is the issue located? (e.g., Kitchen, Bathroom, Apartment 4B)">
+                                </div>
+                                
+                                <!-- Preferred Date/Time -->
+                                <div class="mb-4">
+                                    <label class="block text-gray-700 text-sm font-medium mb-2">Preferred Date/Time for Inspection</label>
+                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        <div>
+                                            <label class="block text-gray-700 text-xs font-medium mb-1" for="preferredDate">Date</label>
+                                            <input type="date" id="preferredDate" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-light">
+                                        </div>
+                                        <div>
+                                            <label class="block text-gray-700 text-xs font-medium mb-1" for="preferredTime">Time</label>
+                                            <select id="preferredTime" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-light">
+                                                <option value="">Any time</option>
+                                                <option value="morning">Morning (8 AM - 12 PM)</option>
+                                                <option value="afternoon">Afternoon (12 PM - 5 PM)</option>
+                                                <option value="evening">Evening (5 PM - 8 PM)</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <p class="text-xs text-gray-500 mt-1">We'll try to accommodate your preferred time, but cannot guarantee it.</p>
+                                </div>
+                                
+                                <!-- Image Upload -->
+                                <div class="mb-4">
+                                    <label class="block text-gray-700 text-sm font-medium mb-2" for="imageUpload">Upload Images (Optional)</label>
+                                    <div class="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center">
+                                        <i class="fas fa-cloud-upload-alt text-3xl text-gray-400 mb-2"></i>
+                                        <p class="text-gray-500">Drag & drop images here or click to browse</p>
+                                        <input type="file" id="imageUpload" class="hidden" multiple accept="image/*">
+                                        <button type="button" id="browseButton" class="mt-2 bg-primary-dark text-white px-4 py-2 rounded-lg text-sm">Browse Files</button>
+                                    </div>
+                                    <div id="imagePreview" class="image-preview-container"></div>
+                                    <p class="text-xs text-gray-500 mt-1">You can upload up to 5 images. Maximum file size: 5MB each.</p>
+                                </div>
+                                
+                                <!-- Contact Information -->
+                                <div class="mb-6">
+                                    <label class="block text-gray-700 text-sm font-medium mb-2">Contact Information</label>
+                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        <div>
+                                            <label class="block text-gray-700 text-xs font-medium mb-1" for="contactName">Name</label>
+                                            <input type="text" id="contactName" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-light" value="John Doe" readonly>
+                                        </div>
+                                        <div>
+                                            <label class="block text-gray-700 text-xs font-medium mb-1" for="contactPhone">Phone</label>
+                                            <input type="text" id="contactPhone" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-light" placeholder="Your phone number">
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Submit Button -->
+                                <button type="submit" class="w-full bg-primary-dark text-white py-3 rounded-lg font-medium hover:bg-primary-light transition flex items-center justify-center">
+                                    <i class="fas fa-paper-plane mr-2"></i> Submit Complaint
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Right column - Complaint Info -->
+                <div class="space-y-6">
+                    <!-- Complaint Guidelines -->
+                    <div class="bg-white rounded-xl shadow-sm overflow-hidden animate-fade-in">
+                        <div class="border-b border-gray-200 p-4">
+                            <h3 class="font-semibold text-gray-800">Complaint Guidelines</h3>
+                        </div>
+                        <div class="p-4">
+                            <div class="space-y-4">
+                                <div class="flex items-start">
+                                    <i class="fas fa-info-circle text-primary-dark mt-1 mr-3"></i>
+                                    <div>
+                                        <h4 class="font-medium text-sm">Be Specific</h4>
+                                        <p class="text-xs text-gray-600">Provide detailed descriptions and location information to help us address your issue quickly.</p>
+                                    </div>
+                                </div>
+                                
+                                <div class="flex items-start">
+                                    <i class="fas fa-camera text-primary-dark mt-1 mr-3"></i>
+                                    <div>
+                                        <h4 class="font-medium text-sm">Include Photos</h4>
+                                        <p class="text-xs text-gray-600">Visual evidence helps our team understand the problem better and respond appropriately.</p>
+                                    </div>
+                                </div>
+                                
+                                <div class="flex items-start">
+                                    <i class="fas fa-clock text-primary-dark mt-1 mr-3"></i>
+                                    <div>
+                                        <h4 class="font-medium text-sm">Response Time</h4>
+                                        <p class="text-xs text-gray-600">High priority issues are typically addressed within 24 hours. Others may take 2-3 business days.</p>
+                                    </div>
+                                </div>
+                                
+                                <div class="flex items-start">
+                                    <i class="fas fa-phone text-primary-dark mt-1 mr-3"></i>
+                                    <div>
+                                        <h4 class="font-medium text-sm">Emergency Contacts</h4>
+                                        <p class="text-xs text-gray-600">For emergencies after hours, call our 24/7 hotline: (555) 123-4567</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Recent Complaints -->
+                    <div class="bg-white rounded-xl shadow-sm overflow-hidden animate-fade-in">
+                        <div class="border-b border-gray-200 p-4">
+                            <h3 class="font-semibold text-gray-800">Recent Complaints</h3>
+                        </div>
+                        <div class="p-4">
+                            <div class="space-y-4">
+                                <div class="border-l-4 border-yellow-500 pl-3 py-1">
+                                    <h4 class="font-medium text-sm">Leaky Kitchen Faucet</h4>
+                                    <div class="flex justify-between items-center mt-1">
+                                        <span class="status-pending">Pending</span>
+                                        <span class="text-xs text-gray-500">Sep 20, 2025</span>
+                                    </div>
+                                </div>
+                                
+                                <div class="border-l-4 border-green-500 pl-3 py-1">
+                                    <h4 class="font-medium text-sm">Broken Light Fixture</h4>
+                                    <div class="flex justify-between items-center mt-1">
+                                        <span class="status-resolved">Resolved</span>
+                                        <span class="text-xs text-gray-500">Sep 15, 2025</span>
+                                    </div>
+                                </div>
+                                
+                                <div class="border-l-4 border-blue-500 pl-3 py-1">
+                                    <h4 class="font-medium text-sm">AC Not Cooling</h4>
+                                    <div class="flex justify-between items-center mt-1">
+                                        <span class="status-in-progress">In Progress</span>
+                                        <span class="text-xs text-gray-500">Sep 10, 2025</span>
+                                    </div>
+                                </div>
+                                
+                                <div class="border-l-4 border-green-500 pl-3 py-1">
+                                    <h4 class="font-medium text-sm">Clogged Bathroom Drain</h4>
+                                    <div class="flex justify-between items-center mt-1">
+                                        <span class="status-resolved">Resolved</span>
+                                        <span class="text-xs text-gray-500">Sep 5, 2025</span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <a href="#" class="block text-center text-primary-dark text-sm font-medium mt-4">View All Complaints</a>
+                        </div>
+                    </div>
+                    
+                    <!-- Emergency Contacts -->
+                    <div class="bg-white rounded-xl shadow-sm overflow-hidden animate-fade-in">
+                        <div class="border-b border-gray-200 p-4">
+                            <h3 class="font-semibold text-gray-800">Emergency Contacts</h3>
+                        </div>
+                        <div class="p-4">
+                            <div class="space-y-3">
+                                <div class="flex justify-between items-center p-3 bg-red-50 rounded-lg">
+                                    <div>
+                                        <h4 class="font-medium text-sm">24/7 Emergency Hotline</h4>
+                                        <p class="text-xs text-gray-600">For urgent issues</p>
+                                    </div>
+                                    <div class="text-right">
+                                        <p class="font-semibold">(555) 123-4567</p>
+                                    </div>
+                                </div>
+                                
+                                <div class="flex justify-between items-center p-3 bg-blue-50 rounded-lg">
+                                    <div>
+                                        <h4 class="font-medium text-sm">Property Manager</h4>
+                                        <p class="text-xs text-gray-600">Michael Johnson</p>
+                                    </div>
+                                    <div class="text-right">
+                                        <p class="font-semibold">(555) 987-6543</p>
+                                    </div>
+                                </div>
+                                
+                                <div class="flex justify-between items-center p-3 bg-green-50 rounded-lg">
+                                    <div>
+                                        <h4 class="font-medium text-sm">Maintenance Supervisor</h4>
+                                        <p class="text-xs text-gray-600">Robert Williams</p>
+                                    </div>
+                                    <div class="text-right">
+                                        <p class="font-semibold">(555) 456-7890</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // Toggle profile menu
+        document.getElementById('profileMenuBtn').addEventListener('click', function() {
+            document.getElementById('profileMenu').classList.toggle('hidden');
+        });
+
+        // Close profile menu when clicking outside
+        document.addEventListener('click', function(event) {
+            const profileMenu = document.getElementById('profileMenu');
+            const profileMenuBtn = document.getElementById('profileMenuBtn');
+            
+            if (!profileMenuBtn.contains(event.target) && !profileMenu.contains(event.target)) {
+                profileMenu.classList.add('hidden');
+            }
+        });
+
+        // Complaint functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const complaintForm = document.getElementById('complaintForm');
+            const complaintSuccess = document.getElementById('complaintSuccess');
+            const complaintError = document.getElementById('complaintError');
+            const complaintProcessing = document.getElementById('complaintProcessing');
+            const errorMessage = document.getElementById('errorMessage');
+            const complaintId = document.getElementById('complaintId');
+            const imageUpload = document.getElementById('imageUpload');
+            const browseButton = document.getElementById('browseButton');
+            const imagePreview = document.getElementById('imagePreview');
+            
+            let uploadedImages = [];
+            
+            // Browse button functionality
+            browseButton.addEventListener('click', function() {
+                imageUpload.click();
+            });
+            
+            // Handle image upload
+            imageUpload.addEventListener('change', function(e) {
+                const files = e.target.files;
+                
+                if (files.length + uploadedImages.length > 5) {
+                    alert('You can only upload up to 5 images.');
+                    return;
+                }
+                
+                for (let i = 0; i < files.length; i++) {
+                    const file = files[i];
+                    
+                    // Check file size (5MB limit)
+                    if (file.size > 5 * 1024 * 1024) {
+                        alert('File size exceeds 5MB limit: ' + file.name);
+                        continue;
+                    }
+                    
+                    // Check if it's an image
+                    if (!file.type.match('image.*')) {
+                        alert('Please upload only image files: ' + file.name);
+                        continue;
+                    }
+                    
+                    const reader = new FileReader();
+                    
+                    reader.onload = function(e) {
+                        const imageData = {
+                            name: file.name,
+                            data: e.target.result
+                        };
+                        
+                        uploadedImages.push(imageData);
+                        updateImagePreview();
+                    };
+                    
+                    reader.readAsDataURL(file);
+                }
+                
+                // Reset the file input
+                imageUpload.value = '';
+            });
+            
+            // Update image preview
+            function updateImagePreview() {
+                imagePreview.innerHTML = '';
+                
+                uploadedImages.forEach((image, index) => {
+                    const previewDiv = document.createElement('div');
+                    previewDiv.className = 'image-preview';
+                    
+                    const img = document.createElement('img');
+                    img.src = image.data;
+                    img.alt = image.name;
+                    
+                    const removeBtn = document.createElement('button');
+                    removeBtn.className = 'remove-image';
+                    removeBtn.innerHTML = '×';
+                    removeBtn.addEventListener('click', function() {
+                        uploadedImages.splice(index, 1);
+                        updateImagePreview();
+                    });
+                    
+                    previewDiv.appendChild(img);
+                    previewDiv.appendChild(removeBtn);
+                    imagePreview.appendChild(previewDiv);
+                });
+            }
+            
+            // Remove image
+            function removeImage(index) {
+                uploadedImages.splice(index, 1);
+                updateImagePreview();
+            }
+            
+            // Handle form submission
+            complaintForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                // Hide any previous messages
+                complaintSuccess.style.display = 'none';
+                complaintError.style.display = 'none';
+                
+                // Validate form
+                if (!validateForm()) {
+                    return;
+                }
+                
+                // Show processing message
+                complaintProcessing.style.display = 'block';
+                
+                // Simulate complaint submission
+                setTimeout(function() {
+                    complaintProcessing.style.display = 'none';
+                    
+                    // Simulate random success/failure (90% success rate)
+                    if (Math.random() > 0.1) {
+                        // Success
+                        const id = 'COMP' + Math.floor(Math.random() * 1000000);
+                        complaintId.textContent = id;
+                        complaintSuccess.style.display = 'block';
+                        
+                        // Reset form
+                        complaintForm.reset();
+                        uploadedImages = [];
+                        updateImagePreview();
+                        
+                        // Scroll to top to show success message
+                        window.scrollTo(0, 0);
+                    } else {
+                        // Failure
+                        errorMessage.textContent = 'There was an error submitting your complaint. Please try again.';
+                        complaintError.style.display = 'block';
+                        
+                        // Scroll to top to show error message
+                        window.scrollTo(0, 0);
+                    }
+                }, 2000);
+            });
+            
+            // Form validation
+            function validateForm() {
+                // Check subject
+                if (document.getElementById('subject').value.trim() === '') {
+                    errorMessage.textContent = 'Please enter a subject for your complaint.';
+                    complaintError.style.display = 'block';
+                    return false;
+                }
+                
+                // Check description
+                if (document.getElementById('description').value.trim() === '') {
+                    errorMessage.textContent = 'Please provide a description of the issue.';
+                    complaintError.style.display = 'block';
+                    return false;
+                }
+                
+                // Check category
+                const categorySelected = document.querySelector('input[name="category"]:checked');
+                if (!categorySelected) {
+                    errorMessage.textContent = 'Please select a category for your complaint.';
+                    complaintError.style.display = 'block';
+                    return false;
+                }
+                
+                // Check priority
+                const prioritySelected = document.querySelector('input[name="priority"]:checked');
+                if (!prioritySelected) {
+                    errorMessage.textContent = 'Please select a priority level for your complaint.';
+                    complaintError.style.display = 'block';
+                    return false;
+                }
+                
+                // Check location
+                if (document.getElementById('location').value.trim() === '') {
+                    errorMessage.textContent = 'Please specify the location of the issue.';
+                    complaintError.style.display = 'block';
+                    return false;
+                }
+                
+                // Check contact phone
+                if (document.getElementById('contactPhone').value.trim() === '') {
+                    errorMessage.textContent = 'Please provide your phone number for contact.';
+                    complaintError.style.display = 'block';
+                    return false;
+                }
+                
+                return true;
+            }
+        });
+    </script>
+</body>
+</html>
